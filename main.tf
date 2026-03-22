@@ -1,3 +1,18 @@
+/*
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.4"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 5.4"
+    }
+  }
+}
+*/
+
 provider "google" {
   project = var.project_id
 }
@@ -61,7 +76,7 @@ module "vpcs" {
 
 # Helper local for VPC networks
 locals {
-  vpcs = ["vpc1", "vpc2", "vpc3", "vpc4", "vpc-routing", "vpcdc"]
+  vpcs = ["vpc1", "vpc2", "vpc3", "vpc4", "vpc-routing", "vpcdc", "vpc-routing2", "vpcdc2"]
 }
 
 resource "google_compute_network" "vpc" {
@@ -169,6 +184,38 @@ resource "google_compute_subnetwork" "subnet120" {
   private_ip_google_access = true
 }
 
+resource "google_compute_subnetwork" "subnet_routing2_1" {
+  name                     = "subnet-routing2-1"
+  network                  = google_compute_network.vpc["vpc-routing2"].id
+  ip_cidr_range            = "10.3.3.0/24"
+  region                   = var.region1
+  private_ip_google_access = true
+}
+
+resource "google_compute_subnetwork" "subnet_routing2_2" {
+  name                     = "subnet-routing2-2"
+  network                  = google_compute_network.vpc["vpc-routing2"].id
+  ip_cidr_range            = "10.4.4.0/24"
+  region                   = var.region2
+  private_ip_google_access = true
+}
+
+resource "google_compute_subnetwork" "subnet210" {
+  name                     = "subnet210"
+  network                  = google_compute_network.vpc["vpcdc2"].id
+  ip_cidr_range            = "10.210.210.0/24"
+  region                   = var.region1
+  private_ip_google_access = true
+}
+
+resource "google_compute_subnetwork" "subnet220" {
+  name                     = "subnet220"
+  network                  = google_compute_network.vpc["vpcdc2"].id
+  ip_cidr_range            = "10.220.220.0/24"
+  region                   = var.region2
+  private_ip_google_access = true
+}
+
 # ==========================================
 # 3. NCC Hub and Spokes
 # ==========================================
@@ -225,152 +272,26 @@ resource "google_network_connectivity_spoke" "nccspk_vpc4" {
 }
 
 # ==========================================
-# 4. VPN Tunnels (Routing to DC)
+# 4. VPN Tunnels (Routing VPCs to DCs)
 # ==========================================
 
-resource "google_compute_ha_vpn_gateway" "havpngw_vpc_routing" {
-  name    = "havpngw-vpc-routing"
-  network = google_compute_network.vpc["vpc-routing"].id
-  region  = var.region1
-}
-
-resource "google_compute_ha_vpn_gateway" "havpngw_vpcdc" {
-  name    = "havpngw-vpcdc"
-  network = google_compute_network.vpc["vpcdc"].id
-  region  = var.region1
-}
-
-resource "google_compute_router" "cldrtr_havpngw_vpc_routing" {
-  name    = "cldrtr-havpngw-vpc-routing"
-  network = google_compute_network.vpc["vpc-routing"].name
-  region  = var.region1
-  bgp {
-    asn               = 65500
-    advertise_mode    = "CUSTOM"
-    advertised_groups = ["ALL_SUBNETS"]
-  }
-}
-
-resource "google_compute_router" "cldrtr_havpngw_vpcdc" {
-  name    = "cldrtr-havpngw-vpcdc"
-  network = google_compute_network.vpc["vpcdc"].name
-  region  = var.region1
-  bgp {
-    asn               = 65501
-    advertise_mode    = "CUSTOM"
-    advertised_groups = ["ALL_SUBNETS"]
-  }
-}
-
-# Tunnels - VPC Routing to VPCDC
-resource "google_compute_vpn_tunnel" "tunnel0_havpngw_vpc_routing" {
-  name                  = "tunnel0-havpngw-vpc-routing"
-  region                = var.region1
-  vpn_gateway           = google_compute_ha_vpn_gateway.havpngw_vpc_routing.id
-  peer_gcp_gateway      = google_compute_ha_vpn_gateway.havpngw_vpcdc.id
-  shared_secret         = "secret"
-  router                = google_compute_router.cldrtr_havpngw_vpc_routing.id
-  vpn_gateway_interface = 0
-}
-
-resource "google_compute_vpn_tunnel" "tunnel1_havpngw_vpc_routing" {
-  name                  = "tunnel1-havpngw-vpc-routing"
-  region                = var.region1
-  vpn_gateway           = google_compute_ha_vpn_gateway.havpngw_vpc_routing.id
-  peer_gcp_gateway      = google_compute_ha_vpn_gateway.havpngw_vpcdc.id
-  shared_secret         = "secret"
-  router                = google_compute_router.cldrtr_havpngw_vpc_routing.id
-  vpn_gateway_interface = 1
-}
-
-# Tunnels - VPCDC to VPC Routing
-resource "google_compute_vpn_tunnel" "tunnel0_havpngw_vpcdc" {
-  name                  = "tunnel0-havpngw-vpcdc"
-  region                = var.region1
-  vpn_gateway           = google_compute_ha_vpn_gateway.havpngw_vpcdc.id
-  peer_gcp_gateway      = google_compute_ha_vpn_gateway.havpngw_vpc_routing.id
-  shared_secret         = "secret"
-  router                = google_compute_router.cldrtr_havpngw_vpcdc.id
-  vpn_gateway_interface = 0
-}
-
-resource "google_compute_vpn_tunnel" "tunnel1_havpngw_vpcdc" {
-  name                  = "tunnel1-havpngw-vpcdc"
-  region                = var.region1
-  vpn_gateway           = google_compute_ha_vpn_gateway.havpngw_vpcdc.id
-  peer_gcp_gateway      = google_compute_ha_vpn_gateway.havpngw_vpc_routing.id
-  shared_secret         = "secret"
-  router                = google_compute_router.cldrtr_havpngw_vpcdc.id
-  vpn_gateway_interface = 1
-}
-
-# BGP Interfaces & Peers
-resource "google_compute_router_interface" "rtrint_tunnel0_routing" {
-  name       = "rtrint-tunnel0-havpngw-vpc-routing"
-  router     = google_compute_router.cldrtr_havpngw_vpc_routing.name
-  region     = var.region1
-  ip_range   = "169.254.0.1/30"
-  vpn_tunnel = google_compute_vpn_tunnel.tunnel0_havpngw_vpc_routing.name
-}
-
-resource "google_compute_router_peer" "peer_tunnel0_routing" {
-  name                      = "peer-tunnel0-havpngw-vpc-routing"
-  router                    = google_compute_router.cldrtr_havpngw_vpc_routing.name
-  region                    = var.region1
-  peer_ip_address           = "169.254.0.2"
-  peer_asn                  = 65501
-  interface                 = google_compute_router_interface.rtrint_tunnel0_routing.name
-}
-
-resource "google_compute_router_interface" "rtrint_tunnel1_routing" {
-  name       = "rtrint-tunnel1-havpngw-vpc-routing"
-  router     = google_compute_router.cldrtr_havpngw_vpc_routing.name
-  region     = var.region1
-  ip_range   = "169.254.1.1/30"
-  vpn_tunnel = google_compute_vpn_tunnel.tunnel1_havpngw_vpc_routing.name
-}
-
-resource "google_compute_router_peer" "peer_tunnel1_routing" {
-  name                      = "peer-tunnel1-havpngw-vpc-routing"
-  router                    = google_compute_router.cldrtr_havpngw_vpc_routing.name
-  region                    = var.region1
-  peer_ip_address           = "169.254.1.2"
-  peer_asn                  = 65501
-  interface                 = google_compute_router_interface.rtrint_tunnel1_routing.name
-}
-
-resource "google_compute_router_interface" "rtrint_tunnel0_dc" {
-  name       = "rtrint-tunnel0-havpngw-vpcdc"
-  router     = google_compute_router.cldrtr_havpngw_vpcdc.name
-  region     = var.region1
-  ip_range   = "169.254.0.2/30"
-  vpn_tunnel = google_compute_vpn_tunnel.tunnel0_havpngw_vpcdc.name
-}
-
-resource "google_compute_router_peer" "peer_tunnel0_dc" {
-  name                      = "peer-tunnel0-havpngw-vpcdc"
-  router                    = google_compute_router.cldrtr_havpngw_vpcdc.name
-  region                    = var.region1
-  peer_ip_address           = "169.254.0.1"
-  peer_asn                  = 65500
-  interface                 = google_compute_router_interface.rtrint_tunnel0_dc.name
-}
-
-resource "google_compute_router_interface" "rtrint_tunnel1_dc" {
-  name       = "rtrint-tunnel1-havpngw-vpcdc"
-  router     = google_compute_router.cldrtr_havpngw_vpcdc.name
-  region     = var.region1
-  ip_range   = "169.254.1.2/30"
-  vpn_tunnel = google_compute_vpn_tunnel.tunnel1_havpngw_vpcdc.name
-}
-
-resource "google_compute_router_peer" "peer_tunnel1_dc" {
-  name                      = "peer-tunnel1-havpngw-vpcdc"
-  router                    = google_compute_router.cldrtr_havpngw_vpcdc.name
-  region                    = var.region1
-  peer_ip_address           = "169.254.1.1"
-  peer_asn                  = 65500
-  interface                 = google_compute_router_interface.rtrint_tunnel1_dc.name
+module "vpn-1" {
+  source     = "github.com/kurtradecki/gcp-vpn-vpc-demo"
+  project-id = var.project_id
+  region1 = var.region1
+  vpc1name  = google_compute_network.vpc["vpc-routing"].name
+  vpc2name  = google_compute_network.vpc["vpcdc"].name
+  vpc1_cldrouter_custom = {
+      all_subnets = true
+      ip_ranges   = {
+        "10.0.0.0/8" = "All 10s"
+      }
+    }
+  vpc2_cldrouter_custom = {
+      all_subnets = true
+      ip_ranges   = {}
+    }
+  depends_on = [ google_compute_network.vpc ]
 }
 
 # Link VPN Tunnels as NCC Spoke
@@ -382,13 +303,57 @@ resource "google_network_connectivity_spoke" "nccspk_vpn_vpc_routing" {
   
   linked_vpn_tunnels {
     uris = [
-      google_compute_vpn_tunnel.tunnel0_havpngw_vpc_routing.self_link,
-      google_compute_vpn_tunnel.tunnel1_havpngw_vpc_routing.self_link
+      "https://www.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region1}/vpnTunnels/vpngw-vpc-routing-remote-0",
+#      google_compute_vpn_tunnel.tunnel0_havpngw_vpc_routing.self_link,
+      "https://www.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region1}/vpnTunnels/vpngw-vpc-routing-remote-1"
     ]
-    site_to_site_data_transfer = true
-    include_import_ranges      = ["ALL_IPV4_RANGES"]
+    site_to_site_data_transfer = false
+#    include_import_ranges      = ["ALL_IPV4_RANGES"]
   }
+  depends_on = [ module.vpn-1 ]
 }
+
+
+module "vpn-2" {
+  source     = "github.com/kurtradecki/gcp-vpn-vpc-demo"
+  project-id = var.project_id
+  region1 = var.region1
+  vpc1name  = google_compute_network.vpc["vpc-routing2"].name
+  vpc2name  = google_compute_network.vpc["vpcdc2"].name
+  vpc1_cldrouter_custom = {
+      all_subnets = true
+      ip_ranges   = {
+        "10.0.0.0/8" = "All 10s"
+      }
+    }
+  vpc2_cldrouter_custom = {
+      all_subnets = true
+      ip_ranges   = {}
+    }
+  depends_on = [ google_compute_network.vpc ]
+}
+
+# Link VPN Tunnels as NCC Spoke
+resource "google_network_connectivity_spoke" "nccspk_vpn_vpc_routing2" {
+  name        = "nccspk-vpn-in-vpc-routing2"
+  location    = var.region1
+  description = "NCC hybrid spoke VPN in vpc-routing2"
+  hub         = google_network_connectivity_hub.ncchub.id
+  
+  linked_vpn_tunnels {
+    uris = [
+      "https://www.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region1}/vpnTunnels/vpngw-vpc-routing2-remote-0",
+#      google_compute_vpn_tunnel.tunnel0_havpngw_vpc_routing.self_link,
+      "https://www.googleapis.com/compute/v1/projects/${var.project_id}/regions/${var.region1}/vpnTunnels/vpngw-vpc-routing2-remote-1"
+    ]
+    site_to_site_data_transfer = false
+#    include_import_ranges      = ["ALL_IPV4_RANGES"]
+  }
+  depends_on = [ module.vpn-2 ]
+}
+
+
+
 
 # ==========================================
 # 5. Global Firewall Policy
@@ -431,7 +396,7 @@ resource "google_compute_network_firewall_policy_rule" "allow_internal" {
 
 # Associates the firewall policy to the VPCs 
 resource "google_compute_network_firewall_policy_association" "fw_vpc_assoc" {
-  for_each          = toset(["vpc1", "vpc2", "vpc3", "vpc4", "vpcdc"])
+  for_each          = toset(["vpc1", "vpc2", "vpc3", "vpc4", "vpcdc", "vpcdc2"])
   name              = "assoc-${each.key}"
   firewall_policy   = google_compute_network_firewall_policy.fw_policy.id
   attachment_target = google_compute_network.vpc[each.key].id
@@ -454,6 +419,8 @@ locals {
     "testvm-region2-vpc4" = { subnet = google_compute_subnetwork.subnet42.id, ip = "10.42.42.2", zone = "${var.region2}-a" }
     "testvm-region1-vpcdc" = { subnet = google_compute_subnetwork.subnet110.id, ip = "10.110.110.2", zone = "${var.region1}-a" }
     "testvm-region2-vpcdc" = { subnet = google_compute_subnetwork.subnet120.id, ip = "10.120.120.2", zone = "${var.region2}-a" }
+    "testvm-region1-vpcdc2" = { subnet = google_compute_subnetwork.subnet210.id, ip = "10.210.210.2", zone = "${var.region1}-a" }
+    "testvm-region2-vpcdc2" = { subnet = google_compute_subnetwork.subnet220.id, ip = "10.220.220.2", zone = "${var.region2}-a" }
   }
 }
 
