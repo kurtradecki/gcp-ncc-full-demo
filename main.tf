@@ -457,6 +457,7 @@ resource "google_compute_instance" "test_vms" {
   service_account {
     scopes = ["https://www.googleapis.com/auth/bigquery"]
   }
+  depends_on = [ google_compute_router.nat_routers, google_compute_router_nat.nats ]
 }
 
 # ==========================================
