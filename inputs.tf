@@ -14,3 +14,9 @@ variable "region2" {
   type        = string
   default     = "us-east1"
 }
+
+variable "route-between-routing-vpcs" {
+  description = "VPC peering connection to allow routing between routing VPCs"
+  type        = bool
+  default     = true
+}
