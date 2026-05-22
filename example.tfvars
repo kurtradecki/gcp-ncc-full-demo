@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# typical build time: 8-10 mins
+# typical build time: 7-9 mins
 
 project_id                 = "<ENTER PROJECT ID HERE>"
 region1                    = "<ENTER 1ST REGION FOR TEST VMs HERE>"
