@@ -21,7 +21,7 @@ locals {
 
 resource "google_compute_instance" "nva1" {
 #  name           = "nva1-${local.temp-name-variation}"
-  name           = "nva1"
+  name           = "nva1-3"
   machine_type   = "n1-standard-8"
   zone           = "${var.region1}-${var.zone-suffix}"
   can_ip_forward = true
@@ -117,8 +117,11 @@ no shut
 ### Global Table Routes
 ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -142,8 +145,11 @@ ip route ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEther
 ### VRF transit routes
 # no default route to global table
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route vrf ${var.vrf-transit-name} 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route vrf ${var.vrf-transit-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -167,8 +173,11 @@ ip route vrf ${var.vrf-transit-name} ${cidrhost(var.health-check-source-ip-range
 # default route to global table
 ip route vrf ${var.vrf-hub1-name} 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1 global
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route vrf ${var.vrf-hub1-name} 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route vrf ${var.vrf-hub1-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -192,8 +201,11 @@ ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-2,
 # default route to global table
 ip route vrf ${var.vrf-hub2-name} 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1 global
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route vrf ${var.vrf-hub2-name} 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route vrf ${var.vrf-hub2-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route vrf ${var.vrf-hub2-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub2-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -228,7 +240,7 @@ EOS
 
 resource "google_compute_instance" "nva2" {
 #  name           = "nva2-${local.temp-name-variation}"
-  name           = "nva2"
+  name           = "nva2-3"
   machine_type   = "n1-standard-8"
   zone           = "${var.region1}-${var.zone-suffix}"
   can_ip_forward = true
@@ -324,8 +336,11 @@ no shut
 ### Global Table Routes
 ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -349,8 +364,11 @@ ip route ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEther
 ### VRF transit routes
 # no default route to global table
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route vrf ${var.vrf-transit-name} 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route vrf ${var.vrf-transit-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -374,8 +392,11 @@ ip route vrf ${var.vrf-transit-name} ${cidrhost(var.health-check-source-ip-range
 # default route to global table
 ip route vrf ${var.vrf-hub1-name} 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1 global
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route vrf ${var.vrf-hub1-name} 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route vrf ${var.vrf-hub1-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
@@ -399,8 +420,11 @@ ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-2,
 # default route to global table
 ip route vrf ${var.vrf-hub2-name} 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1 global
 !
-# route for all spokes in hub 1 - all 10 addresses other than hub 2's 10 addresses 
-ip route vrf ${var.vrf-hub2-name} 10.0.0.0 255.0.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
+# route for DCs and NCC VPC Spokes
+ip route vrf ${var.vrf-hub2-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
+!
+# route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
+ip route vrf ${var.vrf-hub2-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub2-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
