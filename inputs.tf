@@ -37,6 +37,13 @@ variable "route-between-routing-vpcs" {
   default     = true
 }
 
+variable "one_rtg_vpc" {
+  description = "if true, connect single Routing VPC (transit VPC) vs 2 Routing VPCs"
+  type        = bool
+  default     = true
+
+}
+
 
 # ==========================================
 # 9. NVA & attached VPCs, subnets, VMs, FW rules, etc
@@ -166,7 +173,7 @@ variable "zone-suffix" {
 
 variable "vm-name-prefix" {
   type    = string
-  default = "vm-in-"
+  default = "vm-"
 }
 
 
