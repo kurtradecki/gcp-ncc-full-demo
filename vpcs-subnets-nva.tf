@@ -1,0 +1,220 @@
+/**
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+resource "google_compute_network" "vpc-hub1" {
+  name                            = "${var.vpc-prefix}hub1"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-hub1" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub1.name}"
+  ip_cidr_range = "${var.subnet1-vpc-hub1-first-three-octets}${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-hub1.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-hub1-spoke1" {
+ name                            = "${google_compute_network.vpc-hub1.name}-spoke1"
+ auto_create_subnetworks         = false
+ mtu                             = 1460
+ routing_mode                    = "GLOBAL"
+ delete_default_routes_on_create = true
+ depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-hub1-spoke1" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub1-spoke1.name}"
+  ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub1-second-octet}.1${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-hub1-spoke1.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-hub1-spoke2" {
+  name                            = "${google_compute_network.vpc-hub1.name}-spoke2"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-hub1-spoke2" {
+ name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub1-spoke2.name}"
+ ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub1-second-octet}.2${var.last-octet-and-mask}"
+ region        = var.region1
+ network       = google_compute_network.vpc-hub1-spoke2.id
+ log_config {
+   aggregation_interval = "INTERVAL_5_SEC"
+   flow_sampling        = 1.0
+   metadata             = "INCLUDE_ALL_METADATA"
+ }
+}
+
+
+resource "google_compute_network" "vpc-hub2" {
+  name                            = "${var.vpc-prefix}hub2"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-hub2" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub2.name}"
+  ip_cidr_range = "${var.subnet1-vpc-hub2-first-three-octets}${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-hub2.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-hub2-spoke1" {
+  name                            = "${google_compute_network.vpc-hub2.name}-spoke1"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-hub2-spoke1" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub2-spoke1.name}"
+  ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub2-second-octet}.1${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-hub2-spoke1.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-hub2-spoke2" {
+  name                            = "${google_compute_network.vpc-hub2.name}-spoke2"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-hub2-spoke2" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub2-spoke2.name}"
+  ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub2-second-octet}.2${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-hub2-spoke2.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-transit" {
+  name                            = "${var.vpc-prefix}transit"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-transit" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-transit.name}"
+  ip_cidr_range = "${var.subnet1-vpc-transit-first-three-octets}${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-transit.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-untrusted" {
+  name                    = "${var.vpc-prefix}untrusted"
+  auto_create_subnetworks = false
+  mtu                     = 1460
+  routing_mode            = "GLOBAL"
+  depends_on              = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-untrusted" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-untrusted.name}"
+  ip_cidr_range = "${var.subnet1-vpc-untrusted-first-three-octets}${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-untrusted.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+
+resource "google_compute_network" "vpc-management" {
+  name                            = "${var.vpc-prefix}management"
+  auto_create_subnetworks         = false
+  mtu                             = 1460
+  routing_mode                    = "GLOBAL"
+  delete_default_routes_on_create = true
+  depends_on                      = [google_project_service.apis]
+}
+
+
+resource "google_compute_subnetwork" "subnet1-vpc-management" {
+  name          = "${var.subnet1-prefix}${google_compute_network.vpc-management.name}"
+  ip_cidr_range = "${var.subnet1-vpc-management-first-three-octets}${var.last-octet-and-mask}"
+  region        = var.region1
+  network       = google_compute_network.vpc-management.id
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 1.0
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
