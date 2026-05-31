@@ -1,0 +1,177 @@
+resource "google_compute_health_check" "hc" {
+  name               = var.health-check-name
+  check_interval_sec = 1
+  timeout_sec        = 1
+  tcp_health_check {
+    port = "80"
+  }
+}
+
+
+resource "google_compute_instance_group" "ig-nvas" {
+  name      = var.instance-group-name
+  instances = [google_compute_instance.nva1.id, google_compute_instance.nva2.id]
+  zone      = "${var.region1}-${var.zone-suffix}"
+}
+
+
+resource "google_compute_region_backend_service" "ilb-backend-transit" {
+  name          = var.ilb-backend-transit-name
+  region        = var.region1
+  health_checks = [google_compute_health_check.hc.id]
+  protocol      = "TCP"
+  network       = google_compute_network.vpc-transit.self_link
+  backend {
+    group          = google_compute_instance_group.ig-nvas.self_link
+    balancing_mode = "CONNECTION"
+  }
+}
+
+
+resource "google_compute_forwarding_rule" "ilb-forwarding-rule-transit" {
+  name                  = var.ilb-forwarding-rule-transit-name
+  region                = var.region1
+  load_balancing_scheme = "INTERNAL"
+  backend_service       = google_compute_region_backend_service.ilb-backend-transit.id
+  all_ports             = true
+  allow_global_access   = true  
+  ip_address            = "${var.subnet1-vpc-transit-first-three-octets}${var.ilb-forwarding-rule-address}"
+  network               = google_compute_network.vpc-transit.name
+  subnetwork            = google_compute_subnetwork.subnet1-vpc-transit.name
+}
+
+
+resource "google_compute_route" "default-route-to-ilb-transit1" {
+  name         = "${var.default-route-to-ilb-transit-name}1"
+  dest_range   = "10.0.0.0/8"
+  network      = google_compute_network.vpc-transit.name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit.ip_address
+  priority     = 500
+}
+
+
+resource "google_compute_route" "default-route-to-ilb-transit2" {
+  name         = "${var.default-route-to-ilb-transit-name}2"
+  dest_range   = "172.16.0.0/12"
+  network      = google_compute_network.vpc-transit.name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit.ip_address
+  priority     = 500
+}
+
+
+resource "google_compute_route" "default-route-to-ilb-transit3" {
+  name         = "${var.default-route-to-ilb-transit-name}3"
+  dest_range   = "192.168.0.0/16"
+  network      = google_compute_network.vpc-transit.name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit.ip_address
+  priority     = 500
+}
+
+
+resource "google_compute_region_backend_service" "ilb-backend-hub1" {
+  name          = var.ilb-backend-hub1-name
+  region        = var.region1
+  health_checks = [google_compute_health_check.hc.id]
+  protocol      = "TCP"
+  network       = google_compute_network.vpc-hub1.self_link
+  backend {
+    group          = google_compute_instance_group.ig-nvas.self_link
+    balancing_mode = "CONNECTION"
+  }
+}
+
+
+resource "google_compute_forwarding_rule" "ilb-forwarding-rule-hub1" {
+  name                  = var.ilb-forwarding-rule-hub1-name
+  region                = var.region1
+  load_balancing_scheme = "INTERNAL"
+  backend_service       = google_compute_region_backend_service.ilb-backend-hub1.id
+  all_ports             = true
+  allow_global_access   = true
+  ip_address            = "${var.subnet1-vpc-hub1-first-three-octets}${var.ilb-forwarding-rule-address}"
+  network               = google_compute_network.vpc-hub1.name
+  subnetwork            = google_compute_subnetwork.subnet1-vpc-hub1.name
+}
+
+
+resource "google_compute_route" "default-route-to-ilb-hub1" {
+  name         = var.default-route-to-ilb-hub1-name
+  dest_range   = "0.0.0.0/0"
+  network      = google_compute_network.vpc-hub1.name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1.ip_address
+  priority     = 500
+}
+
+
+resource "google_compute_region_backend_service" "ilb-backend-hub2" {
+  name          = var.ilb-backend-hub2-name
+  region        = var.region1
+  health_checks = [google_compute_health_check.hc.id]
+  protocol      = "TCP"
+  network       = google_compute_network.vpc-hub2.self_link
+  backend {
+    group          = google_compute_instance_group.ig-nvas.self_link
+    balancing_mode = "CONNECTION"
+  }
+}
+
+
+resource "google_compute_forwarding_rule" "ilb-forwarding-rule-hub2" {
+  name                  = var.ilb-forwarding-rule-hub2-name
+  region                = var.region1
+  load_balancing_scheme = "INTERNAL"
+  backend_service       = google_compute_region_backend_service.ilb-backend-hub2.id
+  all_ports             = true
+  allow_global_access   = true
+  ip_address            = "${var.subnet1-vpc-hub2-first-three-octets}${var.ilb-forwarding-rule-address}"
+  network               = google_compute_network.vpc-hub2.name
+  subnetwork            = google_compute_subnetwork.subnet1-vpc-hub2.name
+}
+
+
+resource "google_compute_route" "default-route-to-ilb-hub2" {
+  name         = var.default-route-to-ilb-hub2-name
+  dest_range   = "0.0.0.0/0"
+  network      = google_compute_network.vpc-hub2.name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub2.ip_address
+  priority     = 500
+}
+
+
+
+
+
+/*
+module "google_compute_route" {
+  source       = "../../modules/routes" #adding local path
+  project_id   = var.project_id # Replace this with your project ID in quotes
+#  network_name = "default"
+  for_each     = toset(concat(local.spoke_vpcs, local.other_vpcs))
+  network_name = each.key
+
+  routes = [
+    {
+      name              = "egress-internet"
+      description       = "route through IGW to access internet"
+      destination_range = "0.0.0.0/0"
+      tags              = ["egress-inet"]
+      next_hop_internet = true
+    }
+  ]
+}
+*/
+
+
+locals {
+  nva_ncc_spoke_vpcs = ["vpc-hub1-spoke1", "vpc-hub1-spoke2"]
+}
+
+
+resource "google_compute_route" "spoke_routes_to_ilb" {
+  for_each     = toset(local.nva_ncc_spoke_vpcs)
+  name         = "${each.key}-default-route-to-ilb-in-hub1"
+  dest_range   = "0.0.0.0/0"
+  network      = each.key
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1.ip_address
+  priority     = 100
+}
