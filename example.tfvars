@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# typical build time: 7-9 mins
+# typical time to build: 8 mins
+# typical time to destroy: 8 mins
+
 
 project_id                 = "<ENTER PROJECT ID HERE>"
 region1                    = "<ENTER 1ST REGION FOR TEST VMs HERE>"
 region2                    = "<ENTER 2ND REGION FOR TEST VMs HERE>"
-route-between-routing-vpcs = true  # true adds routing needed to route between NCC routing VPCs
