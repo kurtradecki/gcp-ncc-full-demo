@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# typical time to build: 8 mins
+# typical time to build: 10 mins
 # typical time to destroy: 8 mins
 
 # === Future enhancements ===
