@@ -31,8 +31,6 @@
 # 12) test in new project & revise build timing
 # Github upload
 
-# *** Increase NETWORKS-per-project quota to 20
-
 
 project_id                 = "<ENTER PROJECT ID HERE>"
 region1                    = "<ENTER 1ST REGION FOR TEST VMs HERE>"
