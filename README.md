@@ -3,7 +3,7 @@
 With a few settings you can create the following hub and spoke environment with full Google Cloud network setup and a fully configured pair of Network Virtual Appliances (NVAs) for learning a variety of separate though common Google Cloud network patterns all in 1 architecture build. 
 ![Hub and spoke architecture](./archdiagv1.png)
 
-Note: This architecture is purposely overbuilt. It provides a way to build a variety of architectural options built in the same architecture. Your production architecture would likely be much more simplified than the diagram above.
+Note: This architecture is purposely overbuilt. It builds a variety of architectural options built in the same architecture. Your production architecture would likely be much more simplified than the diagram above.
 
 The NVAs used in the script are Cisco Cloud Services Routers (CSRs). Future versions of the script may add modularity and standard Terraform practices if they are needed, though the intent of the script is to create a fixed environment for learning and demonstration, **not production**.
 
@@ -18,11 +18,11 @@ Capabilities that can be demonstrated:
 
 
 Process to run the script:
-* Create a project in GCP, if not already created. Reference if needed [Creating and managing projects ](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
+* Create 1 project in GCP, if not already created. All GCP resources are created in the same project. Reference if needed [Creating and managing projects ](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 * Access the Google Cloud command line (in Cloud Shell or gcloud on your machine). Reference if needed [Launch Cloud Shell](https://cloud.google.com/shell/docs/launching-cloud-shell)
 * At the command prompt run gcloud config set project <project_id> . Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 * In Google Cloud Shell Clone this repo. Reference if needed [Clone a repository](https://cloud.google.com/shell/docs/version-control#clone_a_repository)
-* Note: APIs are enabled and Org policies are set in the script, so you'll need permissions to set those
+* Note: Needed APIs are enabled and Org policies are set in the script, so you'll need permissions to set those
 * Copy exmaple.tfvars (can use [cp command](https://www.geeksforgeeks.org/linux-unix/cp-command-linux-examples/)) to terraform.tfvars and add values in terraform.tfvars such as project-id. Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 * At the command prompt run the following terraform commands:
   * `terraform init`
