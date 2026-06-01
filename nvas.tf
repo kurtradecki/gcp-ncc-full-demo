@@ -21,7 +21,7 @@ locals {
 
 resource "google_compute_instance" "nva1" {
 #  name           = "nva1-${local.temp-name-variation}"
-  name           = "nva1-3"
+  name           = "nva1"
   machine_type   = "n1-standard-8"
   zone           = "${var.region1}-${var.zone-suffix}"
   can_ip_forward = true
@@ -240,7 +240,7 @@ EOS
 
 resource "google_compute_instance" "nva2" {
 #  name           = "nva2-${local.temp-name-variation}"
-  name           = "nva2-3"
+  name           = "nva2"
   machine_type   = "n1-standard-8"
   zone           = "${var.region1}-${var.zone-suffix}"
   can_ip_forward = true
