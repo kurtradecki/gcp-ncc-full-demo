@@ -21,6 +21,7 @@ resource "google_compute_health_check" "hc" {
   tcp_health_check {
     port = "80"
   }
+  depends_on         = [time_sleep.wait_timer]
 }
 
 

@@ -18,6 +18,7 @@ resource "google_network_connectivity_hub" "ncchub2" {
   name        = "nva-ncc-hub"
   description = "ncc hub created from terraform"
   export_psc  = true
+  depends_on  = [time_sleep.wait_timer]
 }
 
 

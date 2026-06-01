@@ -33,7 +33,6 @@ resource "google_compute_network" "vpc" {
   auto_create_subnetworks = false
   routing_mode            = "GLOBAL"
   depends_on              = [time_sleep.wait_timer]
-
 }
 
 # Subnets

@@ -17,6 +17,7 @@
 resource "google_compute_network_firewall_policy" "fw_policy" {
   name        = "fw-policy"
   description = "Global network firewall policy"
+  depends_on  = [time_sleep.wait_timer]
 }
 
 resource "google_compute_network_firewall_policy_rule" "allow_iap_range" {
