@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 resource "google_compute_network_peering" "peering-routing-vpcs-forward" {
   count                = var.route-between-routing-vpcs ? 1 : 0
   name                 = "peering-vpc-routing-to-vpc-routing2"
@@ -32,3 +33,4 @@ resource "google_compute_network_peering" "peering-routing-vpcs-reverse" {
   export_custom_routes = true
   import_custom_routes = true
 }
+*/

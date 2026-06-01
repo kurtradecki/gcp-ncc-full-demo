@@ -20,7 +20,8 @@ resource "google_compute_network" "vpc-hub1" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -43,7 +44,8 @@ resource "google_compute_network" "vpc-hub1-spoke1" {
  mtu                             = 1460
  routing_mode                    = "GLOBAL"
  delete_default_routes_on_create = true
- depends_on                      = [google_project_service.apis]
+ depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -66,7 +68,8 @@ resource "google_compute_network" "vpc-hub1-spoke2" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -89,7 +92,8 @@ resource "google_compute_network" "vpc-hub2" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -112,7 +116,8 @@ resource "google_compute_network" "vpc-hub2-spoke1" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -135,7 +140,8 @@ resource "google_compute_network" "vpc-hub2-spoke2" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -158,7 +164,8 @@ resource "google_compute_network" "vpc-transit" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
+
 }
 
 
@@ -180,7 +187,8 @@ resource "google_compute_network" "vpc-untrusted" {
   auto_create_subnetworks = false
   mtu                     = 1460
   routing_mode            = "GLOBAL"
-  depends_on              = [google_project_service.apis]
+  depends_on              = [time_sleep.wait_timer]
+
 }
 
 
@@ -203,7 +211,7 @@ resource "google_compute_network" "vpc-management" {
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
-  depends_on                      = [google_project_service.apis]
+  depends_on                      = [time_sleep.wait_timer]
 }
 
 
