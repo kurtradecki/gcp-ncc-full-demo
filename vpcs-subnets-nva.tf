@@ -69,7 +69,6 @@ resource "google_compute_network" "vpc-hub1-spoke2" {
   routing_mode                    = "GLOBAL"
   delete_default_routes_on_create = true
   depends_on                      = [time_sleep.wait_timer]
-
 }
 
 
