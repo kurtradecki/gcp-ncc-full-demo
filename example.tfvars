@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # typical time to build: 10 mins
-# typical time to destroy: 8 mins
+# typical time to destroy: 10 mins
 
 # === Future enhancements ===
 # changes all names
