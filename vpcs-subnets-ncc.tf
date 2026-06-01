@@ -23,7 +23,8 @@ module "vpcs" {
 # Helper local for VPC networks
 locals {
   spoke_vpcs = ["vpc1", "vpc2", "vpc3", "vpc4"]
-  other_vpcs = ["vpc-routing", "vpcdc", "vpc-routing2", "vpcdc2"]
+#  other_vpcs = ["vpc-routing", "vpcdc", "vpc-routing2", "vpcdc2"]
+  other_vpcs = ["vpcdc", "vpcdc2"]
 }
 
 resource "google_compute_network" "vpc" {
@@ -31,7 +32,8 @@ resource "google_compute_network" "vpc" {
   name                    = each.key
   auto_create_subnetworks = false
   routing_mode            = "GLOBAL"
-  depends_on              = [google_project_service.apis]
+  depends_on              = [time_sleep.wait_timer]
+
 }
 
 # Subnets
@@ -99,6 +101,7 @@ resource "google_compute_subnetwork" "subnet42" {
   private_ip_google_access = true
 }
 
+/*
 resource "google_compute_subnetwork" "subnet_routing1" {
   name                     = "subnet-routing1"
   network                  = google_compute_network.vpc["vpc-routing"].id
@@ -114,6 +117,7 @@ resource "google_compute_subnetwork" "subnet_routing2" {
   region                   = var.region2
   private_ip_google_access = true
 }
+*/
 
 resource "google_compute_subnetwork" "subnet110" {
   name                     = "subnet110"
@@ -131,6 +135,7 @@ resource "google_compute_subnetwork" "subnet120" {
   private_ip_google_access = true
 }
 
+/*
 resource "google_compute_subnetwork" "subnet_routing2_1" {
   name                     = "subnet-routing2-1"
   network                  = google_compute_network.vpc["vpc-routing2"].id
@@ -146,6 +151,7 @@ resource "google_compute_subnetwork" "subnet_routing2_2" {
   region                   = var.region2
   private_ip_google_access = true
 }
+*/
 
 resource "google_compute_subnetwork" "subnet210" {
   name                     = "subnet210"
