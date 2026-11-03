@@ -15,6 +15,7 @@
  */
 
 resource "google_compute_health_check" "hc" {
+  count              = local.deploy_nva ? 1 : 0
   name               = var.health-check-name
   check_interval_sec = 1
   timeout_sec        = 1
@@ -26,30 +27,33 @@ resource "google_compute_health_check" "hc" {
 
 
 resource "google_compute_instance_group" "ig-nvas" {
+  count     = local.deploy_nva ? 1 : 0
   name      = var.instance-group-name
-  instances = [google_compute_instance.nva1.id, google_compute_instance.nva2.id]
+  instances = [google_compute_instance.nva1[0].self_link, google_compute_instance.nva2[0].self_link]
   zone      = "${var.region1}-${var.zone-suffix}"
 }
 
 
 resource "google_compute_region_backend_service" "ilb-backend-transit" {
+  count         = local.deploy_nva ? 1 : 0
   name          = var.ilb-backend-transit-name
   region        = var.region1
-  health_checks = [google_compute_health_check.hc.id]
+  health_checks = [google_compute_health_check.hc[0].id]
   protocol      = "TCP"
   network       = google_compute_network.vpc-transit.self_link
   backend {
-    group          = google_compute_instance_group.ig-nvas.self_link
+    group          = google_compute_instance_group.ig-nvas[0].self_link
     balancing_mode = "CONNECTION"
   }
 }
 
 
 resource "google_compute_forwarding_rule" "ilb-forwarding-rule-transit" {
+  count                 = local.deploy_nva ? 1 : 0
   name                  = var.ilb-forwarding-rule-transit-name
   region                = var.region1
   load_balancing_scheme = "INTERNAL"
-  backend_service       = google_compute_region_backend_service.ilb-backend-transit.id
+  backend_service       = google_compute_region_backend_service.ilb-backend-transit[0].id
   all_ports             = true
   allow_global_access   = true  
   ip_address            = "${var.subnet1-vpc-transit-first-three-octets}${var.ilb-forwarding-rule-address}"
@@ -59,98 +63,107 @@ resource "google_compute_forwarding_rule" "ilb-forwarding-rule-transit" {
 
 
 resource "google_compute_route" "default-route-to-ilb-transit1" {
+  count        = local.deploy_nva ? 1 : 0
   name         = "${var.default-route-to-ilb-transit-name}1"
   dest_range   = "10.0.0.0/8"
   network      = google_compute_network.vpc-transit.name
-  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit.ip_address
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit[0].ip_address
   priority     = 500
 }
 
 
 resource "google_compute_route" "default-route-to-ilb-transit2" {
+  count        = local.deploy_nva ? 1 : 0
   name         = "${var.default-route-to-ilb-transit-name}2"
   dest_range   = "172.16.0.0/12"
   network      = google_compute_network.vpc-transit.name
-  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit.ip_address
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit[0].ip_address
   priority     = 500
 }
 
 
 resource "google_compute_route" "default-route-to-ilb-transit3" {
+  count        = local.deploy_nva ? 1 : 0
   name         = "${var.default-route-to-ilb-transit-name}3"
   dest_range   = "192.168.0.0/16"
   network      = google_compute_network.vpc-transit.name
-  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit.ip_address
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit[0].ip_address
   priority     = 500
 }
 
 
 resource "google_compute_region_backend_service" "ilb-backend-hub1" {
+  count         = local.deploy_nva ? 1 : 0
   name          = var.ilb-backend-hub1-name
   region        = var.region1
-  health_checks = [google_compute_health_check.hc.id]
+  health_checks = [google_compute_health_check.hc[0].id]
   protocol      = "TCP"
-  network       = google_compute_network.vpc-hub1.self_link
+  network       = google_compute_network.vpc-hub1[0].self_link
   backend {
-    group          = google_compute_instance_group.ig-nvas.self_link
+    group          = google_compute_instance_group.ig-nvas[0].self_link
     balancing_mode = "CONNECTION"
   }
 }
 
 
 resource "google_compute_forwarding_rule" "ilb-forwarding-rule-hub1" {
+  count                 = local.deploy_nva ? 1 : 0
   name                  = var.ilb-forwarding-rule-hub1-name
   region                = var.region1
   load_balancing_scheme = "INTERNAL"
-  backend_service       = google_compute_region_backend_service.ilb-backend-hub1.id
+  backend_service       = google_compute_region_backend_service.ilb-backend-hub1[0].id
   all_ports             = true
   allow_global_access   = true
   ip_address            = "${var.subnet1-vpc-hub1-first-three-octets}${var.ilb-forwarding-rule-address}"
-  network               = google_compute_network.vpc-hub1.name
-  subnetwork            = google_compute_subnetwork.subnet1-vpc-hub1.name
+  network               = google_compute_network.vpc-hub1[0].name
+  subnetwork            = google_compute_subnetwork.subnet1-vpc-hub1[0].name
 }
 
 
 resource "google_compute_route" "default-route-to-ilb-hub1" {
+  count        = local.deploy_nva ? 1 : 0
   name         = var.default-route-to-ilb-hub1-name
   dest_range   = "0.0.0.0/0"
-  network      = google_compute_network.vpc-hub1.name
-  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1.ip_address
+  network      = google_compute_network.vpc-hub1[0].name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1[0].ip_address
   priority     = 500
 }
 
 
 resource "google_compute_region_backend_service" "ilb-backend-hub2" {
+  count         = local.deploy_hub2 ? 1 : 0
   name          = var.ilb-backend-hub2-name
   region        = var.region1
-  health_checks = [google_compute_health_check.hc.id]
+  health_checks = [google_compute_health_check.hc[0].id]
   protocol      = "TCP"
-  network       = google_compute_network.vpc-hub2.self_link
+  network       = google_compute_network.vpc-hub2[0].self_link
   backend {
-    group          = google_compute_instance_group.ig-nvas.self_link
+    group          = google_compute_instance_group.ig-nvas[0].self_link
     balancing_mode = "CONNECTION"
   }
 }
 
 
 resource "google_compute_forwarding_rule" "ilb-forwarding-rule-hub2" {
+  count                 = local.deploy_hub2 ? 1 : 0
   name                  = var.ilb-forwarding-rule-hub2-name
   region                = var.region1
   load_balancing_scheme = "INTERNAL"
-  backend_service       = google_compute_region_backend_service.ilb-backend-hub2.id
+  backend_service       = google_compute_region_backend_service.ilb-backend-hub2[0].id
   all_ports             = true
   allow_global_access   = true
   ip_address            = "${var.subnet1-vpc-hub2-first-three-octets}${var.ilb-forwarding-rule-address}"
-  network               = google_compute_network.vpc-hub2.name
-  subnetwork            = google_compute_subnetwork.subnet1-vpc-hub2.name
+  network               = google_compute_network.vpc-hub2[0].name
+  subnetwork            = google_compute_subnetwork.subnet1-vpc-hub2[0].name
 }
 
 
 resource "google_compute_route" "default-route-to-ilb-hub2" {
+  count        = local.deploy_hub2 ? 1 : 0
   name         = var.default-route-to-ilb-hub2-name
   dest_range   = "0.0.0.0/0"
-  network      = google_compute_network.vpc-hub2.name
-  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub2.ip_address
+  network      = google_compute_network.vpc-hub2[0].name
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub2[0].ip_address
   priority     = 500
 }
 
@@ -185,10 +198,11 @@ locals {
 
 
 resource "google_compute_route" "spoke_routes_to_ilb" {
-  for_each     = toset(local.nva_ncc_spoke_vpcs)
+  for_each     = local.deploy_nva ? toset(local.nva_ncc_spoke_vpcs) : toset([])
   name         = "${each.key}-default-route-to-ilb-in-hub1"
   dest_range   = "0.0.0.0/0"
   network      = each.key
-  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1.ip_address
+  next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1[0].ip_address
   priority     = 100
+  depends_on   = [google_compute_network.vpc-hub1-spoke1, google_compute_network.vpc-hub1-spoke2]
 }

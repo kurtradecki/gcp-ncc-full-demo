@@ -52,7 +52,7 @@ resource "google_compute_network_firewall_policy_rule" "allow_internal" {
 
 # Associates the firewall policy to the VPCs 
 resource "google_compute_network_firewall_policy_association" "fw_vpc_assoc" {
-  for_each          = toset(["vpc1", "vpc2", "vpc3", "vpc4", "vpcdc", "vpcdc2"])
+  for_each          = toset(concat(local.spoke_vpcs, local.other_vpcs))
   name              = "assoc-${each.key}"
   firewall_policy   = google_compute_network_firewall_policy.fw_policy.id
   attachment_target = google_compute_network.vpc[each.key].id

@@ -15,20 +15,23 @@
  */
 
 locals {
-  vms = {
-    "vm-vpc1-r1"   = { subnet = google_compute_subnetwork.subnet11.id, ip = "10.11.11.2", zone = "${var.region1}-a" }
-    "vm-vpc1-r2"   = { subnet = google_compute_subnetwork.subnet12.id, ip = "10.12.12.2", zone = "${var.region2}-a" }
-    "vm-vpc2-r1"   = { subnet = google_compute_subnetwork.subnet21.id, ip = "10.21.21.2", zone = "${var.region1}-a" }
-    "vm-vpc2-r2"   = { subnet = google_compute_subnetwork.subnet22.id, ip = "10.22.22.2", zone = "${var.region2}-a" }
-    "vm-vpc3-r1"   = { subnet = google_compute_subnetwork.subnet31.id, ip = "10.31.31.2", zone = "${var.region1}-a" }
-    "vm-vpc3-r2"   = { subnet = google_compute_subnetwork.subnet32.id, ip = "10.32.32.2", zone = "${var.region2}-a" }
-    "vm-vpc4-r1"   = { subnet = google_compute_subnetwork.subnet41.id, ip = "10.41.41.2", zone = "${var.region1}-a" }
-    "vm-vpc4-r2"   = { subnet = google_compute_subnetwork.subnet42.id, ip = "10.42.42.2", zone = "${var.region2}-a" }
-    "vm-vpc-dc-r1"  = { subnet = google_compute_subnetwork.subnet110.id, ip = "10.110.110.2", zone = "${var.region1}-a" }
-    "vm-vpc-dc-r2"  = { subnet = google_compute_subnetwork.subnet120.id, ip = "10.120.120.2", zone = "${var.region2}-a" }
-    "vm-vpc-dc2-r1" = { subnet = google_compute_subnetwork.subnet210.id, ip = "10.210.210.2", zone = "${var.region1}-a" }
-    "vm-vpc-dc2-r2" = { subnet = google_compute_subnetwork.subnet220.id, ip = "10.220.220.2", zone = "${var.region2}-a" }
+  ncc_spoke_vms = local.deploy_ncc_spokes ? {
+    "vm-vpc1-r1" = { subnet = google_compute_subnetwork.subnet11[0].id, ip = "10.11.11.2", zone = "${var.region1}-c" }
+    "vm-vpc1-r2" = { subnet = google_compute_subnetwork.subnet12[0].id, ip = "10.12.12.2", zone = "${var.region2}-c" }
+    "vm-vpc2-r1" = { subnet = google_compute_subnetwork.subnet21[0].id, ip = "10.21.21.2", zone = "${var.region1}-c" }
+    "vm-vpc2-r2" = { subnet = google_compute_subnetwork.subnet22[0].id, ip = "10.22.22.2", zone = "${var.region2}-c" }
+    "vm-vpc3-r1" = { subnet = google_compute_subnetwork.subnet31[0].id, ip = "10.31.31.2", zone = "${var.region1}-c" }
+    "vm-vpc3-r2" = { subnet = google_compute_subnetwork.subnet32[0].id, ip = "10.32.32.2", zone = "${var.region2}-c" }
+    "vm-vpc4-r1" = { subnet = google_compute_subnetwork.subnet41[0].id, ip = "10.41.41.2", zone = "${var.region1}-c" }
+    "vm-vpc4-r2" = { subnet = google_compute_subnetwork.subnet42[0].id, ip = "10.42.42.2", zone = "${var.region2}-c" }
+  } : {}
+  dc_vms = {
+    "vm-vpc-dc-r1"  = { subnet = google_compute_subnetwork.subnet110.id, ip = "10.110.110.2", zone = "${var.region1}-c" }
+    "vm-vpc-dc-r2"  = { subnet = google_compute_subnetwork.subnet120.id, ip = "10.120.120.2", zone = "${var.region2}-c" }
+    "vm-vpc-dc2-r1" = { subnet = google_compute_subnetwork.subnet210.id, ip = "10.210.210.2", zone = "${var.region1}-c" }
+    "vm-vpc-dc2-r2" = { subnet = google_compute_subnetwork.subnet220.id, ip = "10.220.220.2", zone = "${var.region2}-c" }
   }
+  vms = merge(local.ncc_spoke_vms, local.dc_vms)
 }
 
 resource "google_compute_instance" "test_vms" {
@@ -39,7 +42,7 @@ resource "google_compute_instance" "test_vms" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-11"
+      image = "debian-cloud/debian-12"
     }
   }
 

@@ -17,6 +17,23 @@ variable "project_id" {
   type        = string
 }
 
+variable "option" {
+  description = "Architecture option to deploy: 1 = Only NCC, 2 = NVA + NCC, 3 = NVA + NCC and VPC Peering, 4 = Full architecture"
+  type        = number
+  default     = 4
+
+  validation {
+    condition     = contains([1, 2, 3, 4], var.option)
+    error_message = "Option must be 1 (Only NCC), 2 (NVA + NCC), 3 (NVA + NCC and VPC Peering), or 4 (Full architecture)."
+  }
+}
+
+locals {
+  deploy_ncc_spokes = contains([1, 4], var.option)
+  deploy_nva        = contains([2, 3, 4], var.option)
+  deploy_hub2       = contains([3, 4], var.option)
+}
+
 
 variable "region1" {
   description = "Primary region for resources"

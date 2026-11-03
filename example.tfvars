@@ -35,3 +35,10 @@
 project_id                 = "<ENTER PROJECT ID HERE>"
 region1                    = "<ENTER 1ST REGION FOR TEST VMs HERE>"
 region2                    = "<ENTER 2ND REGION FOR TEST VMs HERE>"
+
+# Architecture Option:
+# 1 = Only NCC
+# 2 = NVA + NCC
+# 3 = NVA + NCC and VPC Peering
+# 4 = Full architecture
+option                     = 4

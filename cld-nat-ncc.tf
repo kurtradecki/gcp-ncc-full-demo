@@ -16,7 +16,7 @@
 
 # Create NATs for individual VPCs 
 resource "google_compute_router" "nat_routers" {
-  for_each = toset(["vpc1", "vpc2", "vpc3", "vpc4", "vpcdc", "vpcdc2"])
+  for_each = toset(concat(local.spoke_vpcs, local.other_vpcs))
   name     = "cldrtr-${each.key}-nat"
   network  = google_compute_network.vpc[each.key].id
   region   = var.region1
