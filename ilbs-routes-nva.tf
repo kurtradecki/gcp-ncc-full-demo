@@ -193,13 +193,13 @@ module "google_compute_route" {
 
 
 locals {
-  nva_ncc_spoke_vpcs = ["vpc-hub1-spoke1", "vpc-hub1-spoke2"]
+  nva_ncc_spoke_vpcs = ["vpc-nva-ncc-spoke1", "vpc-nva-ncc-spoke2"]
 }
 
 
 resource "google_compute_route" "spoke_routes_to_ilb" {
   for_each     = local.deploy_nva ? toset(local.nva_ncc_spoke_vpcs) : toset([])
-  name         = "${each.key}-default-route-to-ilb-in-hub1"
+  name         = "${each.key}-default-route-to-ilb-in-nva-ncc-intrnl"
   dest_range   = "0.0.0.0/0"
   network      = each.key
   next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-hub1[0].ip_address

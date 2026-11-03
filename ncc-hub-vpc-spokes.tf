@@ -24,58 +24,58 @@ resource "google_network_connectivity_hub" "ncchub" {
 
 resource "google_network_connectivity_spoke" "nccspk_vpc1" {
   count       = local.deploy_ncc_spokes ? 1 : 0
-  name        = "nccspk-vpc1"
+  name        = "nccspk-vpc-ncc-spoke1"
   location    = "global"
-  description = "ncc spoke vpc1"
+  description = "ncc spoke vpc-ncc-spoke1"
   hub         = google_network_connectivity_hub.ncchub[0].id
 
   linked_vpc_network {
-    uri                   = google_compute_network.vpc["vpc1"].self_link
+    uri                   = google_compute_network.vpc["vpc-ncc-spoke1"].self_link
     exclude_export_ranges = []
   }
 }
 
 resource "google_network_connectivity_spoke" "nccspk_vpc2" {
   count       = local.deploy_ncc_spokes ? 1 : 0
-  name        = "nccspk-vpc2"
+  name        = "nccspk-vpc-ncc-spoke2"
   location    = "global"
-  description = "ncc spoke vpc2"
+  description = "ncc spoke vpc-ncc-spoke2"
   hub         = google_network_connectivity_hub.ncchub[0].id
 
   linked_vpc_network {
-    uri = google_compute_network.vpc["vpc2"].self_link
+    uri = google_compute_network.vpc["vpc-ncc-spoke2"].self_link
   }
 }
 
 resource "google_network_connectivity_spoke" "nccspk_vpc3" {
   count       = local.deploy_ncc_spokes ? 1 : 0
-  name        = "nccspk-vpc3"
+  name        = "nccspk-vpc-ncc-spoke3"
   location    = "global"
-  description = "ncc spoke vpc3"
+  description = "ncc spoke vpc-ncc-spoke3"
   hub         = google_network_connectivity_hub.ncchub[0].id
 
   linked_vpc_network {
-    uri = google_compute_network.vpc["vpc3"].self_link
+    uri = google_compute_network.vpc["vpc-ncc-spoke3"].self_link
   }
 }
 
 resource "google_network_connectivity_spoke" "nccspk_vpc4" {
   count       = local.deploy_ncc_spokes ? 1 : 0
-  name        = "nccspk-vpc4"
+  name        = "nccspk-vpc-ncc-spoke4"
   location    = "global"
-  description = "ncc spoke vpc4"
+  description = "ncc spoke vpc-ncc-spoke4"
   hub         = google_network_connectivity_hub.ncchub[0].id
 
   linked_vpc_network {
-    uri = google_compute_network.vpc["vpc4"].self_link
+    uri = google_compute_network.vpc["vpc-ncc-spoke4"].self_link
   }
 }
 
 resource "google_network_connectivity_spoke" "nccspk_vpc_transit" {
   count       = local.deploy_ncc_spokes ? 1 : 0
-  name        = "nccspk-vpc-transit"
+  name        = "nccspk-vpc-extrnl"
   location    = "global"
-  description = "ncc spoke vpc-transit"
+  description = "ncc spoke vpc-extrnl"
   hub         = google_network_connectivity_hub.ncchub[0].id
 
   linked_vpc_network {

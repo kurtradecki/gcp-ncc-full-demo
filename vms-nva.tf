@@ -16,7 +16,7 @@
 
 resource "google_compute_instance" "vm-in-hub1-spoke1" {
   count        = local.deploy_nva ? 1 : 0
-  name         = "${var.vm-name-prefix}hub1-spoke1"
+  name         = "${var.vm-name-prefix}nva-ncc-spoke1"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -41,7 +41,7 @@ resource "google_compute_instance" "vm-in-hub1-spoke1" {
 
 resource "google_compute_instance" "vm-in-hub1-spoke2" {
   count        = local.deploy_nva ? 1 : 0
-  name         = "${var.vm-name-prefix}hub1-spoke2"
+  name         = "${var.vm-name-prefix}nva-ncc-spoke2"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -66,7 +66,7 @@ resource "google_compute_instance" "vm-in-hub1-spoke2" {
 
 resource "google_compute_instance" "vm-in-hub1" {
   count        = local.deploy_nva ? 1 : 0
-  name         = "${var.vm-name-prefix}hub1"
+  name         = "${var.vm-name-prefix}nva-ncc-intrnl"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -93,7 +93,7 @@ resource "google_compute_instance" "vm-in-hub1" {
 
 resource "google_compute_instance" "vm-in-hub2-spoke1" {
   count        = local.deploy_hub2 ? 1 : 0
-  name         = "${var.vm-name-prefix}hub2-spoke1"
+  name         = "${var.vm-name-prefix}nva-prng-spoke1"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -120,7 +120,7 @@ resource "google_compute_instance" "vm-in-hub2-spoke1" {
 
 resource "google_compute_instance" "vm-in-hub2-spoke2" {
   count        = local.deploy_hub2 ? 1 : 0
-  name         = "${var.vm-name-prefix}hub2-spoke2"
+  name         = "${var.vm-name-prefix}nva-prng-spoke2"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -147,7 +147,7 @@ resource "google_compute_instance" "vm-in-hub2-spoke2" {
 
 resource "google_compute_instance" "vm-in-hub2" {
   count        = local.deploy_hub2 ? 1 : 0
-  name         = "${var.vm-name-prefix}hub2"
+  name         = "${var.vm-name-prefix}nva-prng-hub"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -173,7 +173,7 @@ resource "google_compute_instance" "vm-in-hub2" {
 
 
 resource "google_compute_instance" "vm-in-transit" {
-  name         = "${var.vm-name-prefix}transit"
+  name         = "${var.vm-name-prefix}extrnl"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -200,7 +200,7 @@ resource "google_compute_instance" "vm-in-transit" {
 
 resource "google_compute_instance" "vm-in-untrusted" {
   count        = local.deploy_nva ? 1 : 0
-  name         = "${var.vm-name-prefix}untrusted"
+  name         = "${var.vm-name-prefix}nva-extrnl-inet"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
@@ -227,7 +227,7 @@ resource "google_compute_instance" "vm-in-untrusted" {
 
 resource "google_compute_instance" "vm-in-management" {
   count        = local.deploy_nva ? 1 : 0
-  name         = "${var.vm-name-prefix}management"
+  name         = "${var.vm-name-prefix}nva-mgmt"
   machine_type = var.vm-machine-type
   zone         = "${var.region1}-${var.zone-suffix}"
   tags         = ["test-instance"]
