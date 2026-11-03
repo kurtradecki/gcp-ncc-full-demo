@@ -16,7 +16,7 @@
 
 resource "google_compute_network" "vpc-hub1" {
   count                           = local.deploy_nva ? 1 : 0
-  name                            = "${var.vpc-prefix}hub1"
+  name                            = "${var.vpc-prefix}nva-ncc-intrnl"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -28,7 +28,7 @@ resource "google_compute_network" "vpc-hub1" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-hub1" {
   count         = local.deploy_nva ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub1[0].name}"
+  name          = "${var.subnet1-prefix}nva-ncc-intrnl"
   ip_cidr_range = "${var.subnet1-vpc-hub1-first-three-octets}${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-hub1[0].id
@@ -42,7 +42,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-hub1" {
 
 resource "google_compute_network" "vpc-hub1-spoke1" {
   count                           = local.deploy_nva ? 1 : 0
-  name                            = "${google_compute_network.vpc-hub1[0].name}-spoke1"
+  name                            = "${var.vpc-prefix}nva-ncc-spoke1"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -54,7 +54,7 @@ resource "google_compute_network" "vpc-hub1-spoke1" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-hub1-spoke1" {
   count         = local.deploy_nva ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub1-spoke1[0].name}"
+  name          = "${var.subnet1-prefix}nva-ncc-spoke1"
   ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub1-second-octet}.1${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-hub1-spoke1[0].id
@@ -68,7 +68,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-hub1-spoke1" {
 
 resource "google_compute_network" "vpc-hub1-spoke2" {
   count                           = local.deploy_nva ? 1 : 0
-  name                            = "${google_compute_network.vpc-hub1[0].name}-spoke2"
+  name                            = "${var.vpc-prefix}nva-ncc-spoke2"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -79,7 +79,7 @@ resource "google_compute_network" "vpc-hub1-spoke2" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-hub1-spoke2" {
   count         = local.deploy_nva ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub1-spoke2[0].name}"
+  name          = "${var.subnet1-prefix}nva-ncc-spoke2"
   ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub1-second-octet}.2${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-hub1-spoke2[0].id
@@ -93,7 +93,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-hub1-spoke2" {
 
 resource "google_compute_network" "vpc-hub2" {
   count                           = local.deploy_hub2 ? 1 : 0
-  name                            = "${var.vpc-prefix}hub2"
+  name                            = "${var.vpc-prefix}nva-prng-hub"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -105,7 +105,7 @@ resource "google_compute_network" "vpc-hub2" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-hub2" {
   count         = local.deploy_hub2 ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub2[0].name}"
+  name          = "${var.subnet1-prefix}nva-prng-hub"
   ip_cidr_range = "${var.subnet1-vpc-hub2-first-three-octets}${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-hub2[0].id
@@ -119,7 +119,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-hub2" {
 
 resource "google_compute_network" "vpc-hub2-spoke1" {
   count                           = local.deploy_hub2 ? 1 : 0
-  name                            = "${google_compute_network.vpc-hub2[0].name}-spoke1"
+  name                            = "${var.vpc-prefix}nva-prng-spoke1"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -131,7 +131,7 @@ resource "google_compute_network" "vpc-hub2-spoke1" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-hub2-spoke1" {
   count         = local.deploy_hub2 ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub2-spoke1[0].name}"
+  name          = "${var.subnet1-prefix}nva-prng-spoke1"
   ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub2-second-octet}.1${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-hub2-spoke1[0].id
@@ -145,7 +145,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-hub2-spoke1" {
 
 resource "google_compute_network" "vpc-hub2-spoke2" {
   count                           = local.deploy_hub2 ? 1 : 0
-  name                            = "${google_compute_network.vpc-hub2[0].name}-spoke2"
+  name                            = "${var.vpc-prefix}nva-prng-spoke2"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -157,7 +157,7 @@ resource "google_compute_network" "vpc-hub2-spoke2" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-hub2-spoke2" {
   count         = local.deploy_hub2 ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-hub2-spoke2[0].name}"
+  name          = "${var.subnet1-prefix}nva-prng-spoke2"
   ip_cidr_range = "${var.spoke-first-octet}${var.spoke-hub2-second-octet}.2${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-hub2-spoke2[0].id
@@ -170,7 +170,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-hub2-spoke2" {
 
 
 resource "google_compute_network" "vpc-transit" {
-  name                            = "${var.vpc-prefix}transit"
+  name                            = "${var.vpc-prefix}extrnl"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -181,7 +181,7 @@ resource "google_compute_network" "vpc-transit" {
 
 
 resource "google_compute_subnetwork" "subnet1-vpc-transit" {
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-transit.name}"
+  name          = "${var.subnet1-prefix}extrnl"
   ip_cidr_range = "${var.subnet1-vpc-transit-first-three-octets}${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-transit.id
@@ -195,7 +195,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-transit" {
 
 resource "google_compute_network" "vpc-untrusted" {
   count                   = local.deploy_nva ? 1 : 0
-  name                    = "${var.vpc-prefix}untrusted"
+  name                    = "${var.vpc-prefix}nva-extrnl-inet"
   auto_create_subnetworks = false
   mtu                     = 1460
   routing_mode            = "GLOBAL"
@@ -206,7 +206,7 @@ resource "google_compute_network" "vpc-untrusted" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-untrusted" {
   count         = local.deploy_nva ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-untrusted[0].name}"
+  name          = "${var.subnet1-prefix}nva-extrnl-inet"
   ip_cidr_range = "${var.subnet1-vpc-untrusted-first-three-octets}${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-untrusted[0].id
@@ -220,7 +220,7 @@ resource "google_compute_subnetwork" "subnet1-vpc-untrusted" {
 
 resource "google_compute_network" "vpc-management" {
   count                           = local.deploy_nva ? 1 : 0
-  name                            = "${var.vpc-prefix}management"
+  name                            = "${var.vpc-prefix}nva-mgmt"
   auto_create_subnetworks         = false
   mtu                             = 1460
   routing_mode                    = "GLOBAL"
@@ -231,7 +231,7 @@ resource "google_compute_network" "vpc-management" {
 
 resource "google_compute_subnetwork" "subnet1-vpc-management" {
   count         = local.deploy_nva ? 1 : 0
-  name          = "${var.subnet1-prefix}${google_compute_network.vpc-management[0].name}"
+  name          = "${var.subnet1-prefix}nva-mgmt"
   ip_cidr_range = "${var.subnet1-vpc-management-first-three-octets}${var.last-octet-and-mask}"
   region        = var.region1
   network       = google_compute_network.vpc-management[0].id

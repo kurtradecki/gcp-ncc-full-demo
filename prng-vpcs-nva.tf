@@ -16,7 +16,7 @@
 
 resource "google_compute_network_peering" "peering-hub2-spoke1" {
   count                = local.deploy_hub2 ? 1 : 0
-  name                 = "peering-hub2-spoke1"
+  name                 = "peering-nva-prng-hub-spoke1"
   network              = google_compute_network.vpc-hub2[0].self_link
   peer_network         = google_compute_network.vpc-hub2-spoke1[0].self_link
   export_custom_routes = true
@@ -26,7 +26,7 @@ resource "google_compute_network_peering" "peering-hub2-spoke1" {
 
 resource "google_compute_network_peering" "peering-spoke1-hub2" {
   count                = local.deploy_hub2 ? 1 : 0
-  name                 = "peering-spoke1-hub2"
+  name                 = "peering-spoke1-nva-prng-hub"
   network              = google_compute_network.vpc-hub2-spoke1[0].self_link
   peer_network         = google_compute_network.vpc-hub2[0].self_link
   export_custom_routes = true
@@ -36,7 +36,7 @@ resource "google_compute_network_peering" "peering-spoke1-hub2" {
 
 resource "google_compute_network_peering" "peering-hub2-spoke2" {
   count                = local.deploy_hub2 ? 1 : 0
-  name                 = "peering-hub2-spoke2"
+  name                 = "peering-nva-prng-hub-spoke2"
   network              = google_compute_network.vpc-hub2[0].self_link
   peer_network         = google_compute_network.vpc-hub2-spoke2[0].self_link
   export_custom_routes = true
@@ -46,7 +46,7 @@ resource "google_compute_network_peering" "peering-hub2-spoke2" {
 
 resource "google_compute_network_peering" "peering-spoke2-hub2" {
   count                = local.deploy_hub2 ? 1 : 0
-  name                 = "peering-spoke2-hub2"
+  name                 = "peering-spoke2-nva-prng-hub"
   network              = google_compute_network.vpc-hub2-spoke2[0].self_link
   peer_network         = google_compute_network.vpc-hub2[0].self_link
   export_custom_routes = true
@@ -56,7 +56,7 @@ resource "google_compute_network_peering" "peering-spoke2-hub2" {
 
 resource "google_compute_network_peering" "peering-transit-management" {
   count                = local.deploy_nva ? 1 : 0
-  name                 = "peering-transit-management"
+  name                 = "peering-extrnl-nva-mgmt"
   network              = google_compute_network.vpc-transit.self_link
   peer_network         = google_compute_network.vpc-management[0].self_link
   export_custom_routes = true
@@ -66,7 +66,7 @@ resource "google_compute_network_peering" "peering-transit-management" {
 
 resource "google_compute_network_peering" "peering-management-transit" {
   count                = local.deploy_nva ? 1 : 0
-  name                 = "peering-management-transit"
+  name                 = "peering-nva-mgmt-extrnl"
   network              = google_compute_network.vpc-management[0].self_link
   peer_network         = google_compute_network.vpc-transit.self_link
   export_custom_routes = true

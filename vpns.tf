@@ -20,7 +20,7 @@ module "vpn-1" {
   region1    = var.region1
 #  vpc1name   = google_compute_network.vpc["vpc-routing"].name
   vpc1name   = var.one_rtg_vpc == true ? google_compute_network.vpc-transit.name : google_compute_network.vpc["vpc-routing"].name
-  vpc2name   = google_compute_network.vpc["vpcdc"].name
+  vpc2name   = google_compute_network.vpc["vpc-dc1"].name
   vpc1_cldrouter_custom = {
     all_subnets = true
     ip_ranges = {
@@ -43,7 +43,7 @@ module "vpn-2" {
   region1    = var.region2
 #  vpc1name   = google_compute_network.vpc["vpc-routing2"].name
   vpc1name   = var.one_rtg_vpc == true ? google_compute_network.vpc-transit.name : google_compute_network.vpc["vpc-routing2"].name
-  vpc2name   = google_compute_network.vpc["vpcdc2"].name
+  vpc2name   = google_compute_network.vpc["vpc-dc2"].name
   vpc1_cldrouter_custom = {
     all_subnets = true
     ip_ranges = {

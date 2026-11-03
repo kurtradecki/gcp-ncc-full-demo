@@ -22,6 +22,7 @@ resource "google_compute_route" "route-from-vpc-spokes-to-ilb-transit-10" {
   network      = "projects/${var.project_id}/global/networks/${each.value}"
   next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit[0].ip_address
   priority     = 500
+  depends_on   = [google_compute_network.vpc]
 }
 
 
@@ -33,6 +34,7 @@ resource "google_compute_route" "route-from-vpc-spokes-to-ilb-transit-172" {
   network      = "projects/${var.project_id}/global/networks/${each.value}"
   next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit[0].ip_address
   priority     = 500
+  depends_on   = [google_compute_network.vpc]
 }
 
 
@@ -44,4 +46,5 @@ resource "google_compute_route" "route-from-vpc-spokes-to-ilb-transit-192" {
   network      = "projects/${var.project_id}/global/networks/${each.value}"
   next_hop_ilb = google_compute_forwarding_rule.ilb-forwarding-rule-transit[0].ip_address
   priority     = 500
+  depends_on   = [google_compute_network.vpc]
 }

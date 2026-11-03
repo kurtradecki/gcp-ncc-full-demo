@@ -16,7 +16,7 @@
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub1" {
   count     = local.deploy_nva ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub1"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-ncc-intrnl"
   network   = google_compute_network.vpc-hub1[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -33,7 +33,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub1-spoke1" {
   count     = local.deploy_nva ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub1-spoke1"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-ncc-spoke1"
   network   = google_compute_network.vpc-hub1-spoke1[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -50,7 +50,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub1-spoke2" {
   count     = local.deploy_nva ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub1-spoke2"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-ncc-spoke2"
   network   = google_compute_network.vpc-hub1-spoke2[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -67,7 +67,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub2" {
   count     = local.deploy_hub2 ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub2"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-prng-hub"
   network   = google_compute_network.vpc-hub2[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -86,7 +86,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub2-spoke1" {
   count     = local.deploy_hub2 ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub2-spoke1"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-prng-spoke1"
   network   = google_compute_network.vpc-hub2-spoke1[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -105,7 +105,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub2-spoke2" {
   count     = local.deploy_hub2 ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-hub2-spoke2"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-prng-spoke2"
   network   = google_compute_network.vpc-hub2-spoke2[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -123,7 +123,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-transit" {
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-transit"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-extrnl"
   network   = google_compute_network.vpc-transit.self_link
   direction = "INGRESS"
   priority  = "500"
@@ -142,7 +142,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-untrusted" {
   count     = local.deploy_nva ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-untrusted"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-extrnl-inet"
   network   = google_compute_network.vpc-untrusted[0].self_link
   direction = "INGRESS"
   priority  = "500"
@@ -159,7 +159,7 @@ resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-v
 
 resource "google_compute_firewall" "allow-ssh-rdp-icmp-http-https-from-private-vpc-management" {
   count     = local.deploy_nva ? 1 : 0
-  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-management"
+  name      = "allow-ssh-rdp-icmp-http-https-from-private-vpc-nva-mgmt"
   network   = google_compute_network.vpc-management[0].self_link
   direction = "INGRESS"
   priority  = "500"

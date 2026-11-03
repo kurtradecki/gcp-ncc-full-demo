@@ -190,7 +190,7 @@ variable "zone-suffix" {
 
 variable "vm-name-prefix" {
   type    = string
-  default = "vm-"
+  default = "vm-in-"
 }
 
 
@@ -269,19 +269,19 @@ variable "ilb-backend-untrusted-name" {
 
 variable "ilb-backend-transit-name" {
   type    = string
-  default = "ilb-nva-transit"
+  default = "ilb-nva-extrnl"
 }
 
 
 variable "ilb-backend-hub1-name" {
   type    = string
-  default = "ilb-nva-hub1"
+  default = "ilb-nva-ncc-intrnl"
 }
 
 
 variable "ilb-backend-hub2-name" {
   type    = string
-  default = "ilb-nva-hub2"
+  default = "ilb-nva-prng-hub"
 }
 
 
@@ -293,19 +293,19 @@ variable "ilb-forwarding-rule-untrusted-name" {
 
 variable "ilb-forwarding-rule-transit-name" {
   type    = string
-  default = "ilb-forwarding-rule-transit"
+  default = "ilb-forwarding-rule-extrnl"
 }
 
 
 variable "ilb-forwarding-rule-hub1-name" {
   type    = string
-  default = "ilb-forwarding-rule-hub1"
+  default = "ilb-forwarding-rule-nva-ncc-intrnl"
 }
 
 
 variable "ilb-forwarding-rule-hub2-name" {
   type    = string
-  default = "ilb-forwarding-rule-hub2"
+  default = "ilb-forwarding-rule-nva-prng-hub"
 }
 
 
@@ -329,19 +329,19 @@ variable "route-10-to-ilb-untrusted-name" {
 
 variable "default-route-to-ilb-transit-name" {
   type    = string
-  default = "default-route-to-ilb-transit"
+  default = "default-route-to-ilb-extrnl"
 }
 
 
 variable "default-route-to-ilb-hub1-name" {
   type    = string
-  default = "default-route-to-ilb-hub1"
+  default = "default-route-to-ilb-nva-ncc-intrnl"
 }
 
 
 variable "default-route-to-ilb-hub2-name" {
   type    = string
-  default = "default-route-to-ilb-hub2"
+  default = "default-route-to-ilb-nva-prng-hub"
 }
 
 

@@ -25,9 +25,9 @@ resource "google_network_connectivity_hub" "ncchub2" {
 
 resource "google_network_connectivity_spoke" "nccspk_vpc_hub1" {
   count       = local.deploy_nva ? 1 : 0
-  name        = "nccspk-vpc-hub1"
+  name        = "nccspk-vpc-nva-ncc-intrnl"
   location    = "global"
-  description = "ncc spoke vpc-hub1"
+  description = "ncc spoke vpc-nva-ncc-intrnl"
   hub         = google_network_connectivity_hub.ncchub2[0].id
   
   linked_vpc_network {
@@ -39,9 +39,9 @@ resource "google_network_connectivity_spoke" "nccspk_vpc_hub1" {
 
 resource "google_network_connectivity_spoke" "nccspk_vpc_hub1_spoke1" {
   count       = local.deploy_nva ? 1 : 0
-  name        = "nccspk-vpc-hub1-spoke1"
+  name        = "nccspk-vpc-nva-ncc-spoke1"
   location    = "global"
-  description = "ncc spoke vpc-hub1-spoke1"
+  description = "ncc spoke vpc-nva-ncc-spoke1"
   hub         = google_network_connectivity_hub.ncchub2[0].id
   
   linked_vpc_network {
@@ -53,9 +53,9 @@ resource "google_network_connectivity_spoke" "nccspk_vpc_hub1_spoke1" {
 
 resource "google_network_connectivity_spoke" "nccspk_vpc_hub1_vpc_hub1_spoke2" {
   count       = local.deploy_nva ? 1 : 0
-  name        = "nccspk-vpc-hub1-spoke2"
+  name        = "nccspk-vpc-nva-ncc-spoke2"
   location    = "global"
-  description = "ncc spoke vpc-hub1-spoke1"
+  description = "ncc spoke vpc-nva-ncc-spoke2"
   hub         = google_network_connectivity_hub.ncchub2[0].id
   
   linked_vpc_network {
