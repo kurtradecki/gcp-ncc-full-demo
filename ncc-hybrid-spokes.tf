@@ -15,10 +15,11 @@
  */
 
 resource "google_network_connectivity_spoke" "nccspk_vpn" {
+  count       = local.deploy_ncc_spokes ? 1 : 0
   name        = "nccspk-vpn1-in-vpc-transit"
   location    = var.region1
   description = "NCC hybrid spoke VPN"
-  hub         = google_network_connectivity_hub.ncchub.id
+  hub         = google_network_connectivity_hub.ncchub[0].id
 /*
   linked_vpn_tunnels {
     uris = [
@@ -42,10 +43,11 @@ resource "google_network_connectivity_spoke" "nccspk_vpn" {
 
 # Link VPN Tunnels as NCC Spoke
 resource "google_network_connectivity_spoke" "nccspk_vpn2" {
+  count       = local.deploy_ncc_spokes ? 1 : 0
   name        = "nccspk-vpn2-in-vpc-transit"
   location    = var.region2
   description = "NCC hybrid spoke VPN in vpc-routing2"
-  hub         = google_network_connectivity_hub.ncchub.id
+  hub         = google_network_connectivity_hub.ncchub[0].id
 
   linked_vpn_tunnels {
     uris = [

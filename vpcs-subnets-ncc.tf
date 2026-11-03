@@ -22,7 +22,7 @@ module "vpcs" {
 
 # Helper local for VPC networks
 locals {
-  spoke_vpcs = ["vpc1", "vpc2", "vpc3", "vpc4"]
+  spoke_vpcs = local.deploy_ncc_spokes ? ["vpc1", "vpc2", "vpc3", "vpc4"] : []
 #  other_vpcs = ["vpc-routing", "vpcdc", "vpc-routing2", "vpcdc2"]
   other_vpcs = ["vpcdc", "vpcdc2"]
 }
@@ -37,6 +37,7 @@ resource "google_compute_network" "vpc" {
 
 # Subnets
 resource "google_compute_subnetwork" "subnet11" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet11"
   network                  = google_compute_network.vpc["vpc1"].id
   ip_cidr_range            = "10.11.11.0/24"
@@ -45,6 +46,7 @@ resource "google_compute_subnetwork" "subnet11" {
 }
 
 resource "google_compute_subnetwork" "subnet12" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet12"
   network                  = google_compute_network.vpc["vpc1"].id
   ip_cidr_range            = "10.12.12.0/24"
@@ -53,6 +55,7 @@ resource "google_compute_subnetwork" "subnet12" {
 }
 
 resource "google_compute_subnetwork" "subnet21" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet21"
   network                  = google_compute_network.vpc["vpc2"].id
   ip_cidr_range            = "10.21.21.0/24"
@@ -61,6 +64,7 @@ resource "google_compute_subnetwork" "subnet21" {
 }
 
 resource "google_compute_subnetwork" "subnet22" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet22"
   network                  = google_compute_network.vpc["vpc2"].id
   ip_cidr_range            = "10.22.22.0/24"
@@ -69,6 +73,7 @@ resource "google_compute_subnetwork" "subnet22" {
 }
 
 resource "google_compute_subnetwork" "subnet31" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet31"
   network                  = google_compute_network.vpc["vpc3"].id
   ip_cidr_range            = "10.31.31.0/24"
@@ -77,6 +82,7 @@ resource "google_compute_subnetwork" "subnet31" {
 }
 
 resource "google_compute_subnetwork" "subnet32" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet32"
   network                  = google_compute_network.vpc["vpc3"].id
   ip_cidr_range            = "10.32.32.0/24"
@@ -85,6 +91,7 @@ resource "google_compute_subnetwork" "subnet32" {
 }
 
 resource "google_compute_subnetwork" "subnet41" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet41"
   network                  = google_compute_network.vpc["vpc4"].id
   ip_cidr_range            = "10.41.41.0/24"
@@ -93,6 +100,7 @@ resource "google_compute_subnetwork" "subnet41" {
 }
 
 resource "google_compute_subnetwork" "subnet42" {
+  count                    = local.deploy_ncc_spokes ? 1 : 0
   name                     = "subnet42"
   network                  = google_compute_network.vpc["vpc4"].id
   ip_cidr_range            = "10.42.42.0/24"

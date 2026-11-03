@@ -20,6 +20,7 @@ locals {
 
 
 resource "google_compute_instance" "nva1" {
+  count          = local.deploy_nva ? 1 : 0
 #  name           = "nva1-${local.temp-name-variation}"
   name           = "nva1"
   machine_type   = "n1-standard-8"
@@ -32,14 +33,14 @@ resource "google_compute_instance" "nva1" {
     }
   }
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-untrusted.self_link
+    subnetwork = google_compute_subnetwork.subnet1-vpc-untrusted[0].self_link
     network_ip = "${var.subnet1-vpc-untrusted-first-three-octets}${var.nva1-int-address}"
     access_config {
       # ephemeral public IP
     }
   }
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-management.self_link
+    subnetwork = google_compute_subnetwork.subnet1-vpc-management[0].self_link
     network_ip = "${var.subnet1-vpc-management-first-three-octets}${var.nva1-int-address}"
   }
   network_interface {
@@ -47,12 +48,15 @@ resource "google_compute_instance" "nva1" {
     network_ip = "${var.subnet1-vpc-transit-first-three-octets}${var.nva1-int-address}"
   }
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-hub1.self_link
+    subnetwork = google_compute_subnetwork.subnet1-vpc-hub1[0].self_link
     network_ip = "${var.subnet1-vpc-hub1-first-three-octets}${var.nva1-int-address}"
   }
-  network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-hub2.self_link
-    network_ip = "${var.subnet1-vpc-hub2-first-three-octets}${var.nva1-int-address}"
+  dynamic "network_interface" {
+    for_each = local.deploy_hub2 ? [1] : []
+    content {
+      subnetwork = google_compute_subnetwork.subnet1-vpc-hub2[0].self_link
+      network_ip = "${var.subnet1-vpc-hub2-first-three-octets}${var.nva1-int-address}"
+    }
   }
   metadata = {
     # Note: the "1.1.1" in the cidrnetmask function is a placeholder, ie doesn't matter, only the mask matters) 
@@ -75,11 +79,13 @@ rd ${var.vrf-hub1-route-descriptor}
 address-family ipv4
 exit-address-family
 !
+%{ if local.deploy_hub2 ~}
 vrf definition ${var.vrf-hub2-name}
 rd ${var.vrf-hub2-route-descriptor}
 address-family ipv4
 exit-address-family
 !
+%{ endif ~}
 interface GigabitEthernet1
 description VPC untrusted - no secondary address for LB configured - not needed on GigabitEthernet1 / VM nic0
 ip address ${var.subnet1-vpc-untrusted-first-three-octets}${var.nva1-int-address} ${cidrnetmask("1.1.1${var.last-octet-and-mask}")}
@@ -106,6 +112,7 @@ ip address ${var.subnet1-vpc-hub1-first-three-octets}${var.ilb-forwarding-rule-a
 ip nat inside
 no shut
 !
+%{ if local.deploy_hub2 ~}
 interface GigabitEthernet5
 description hub 2
 vrf forwarding ${var.vrf-hub2-name}
@@ -114,6 +121,7 @@ ip address ${var.subnet1-vpc-hub2-first-three-octets}${var.ilb-forwarding-rule-a
 ip nat inside
 no shut
 !
+%{ endif ~}
 ### Global Table Routes
 ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1
 !
@@ -123,9 +131,11 @@ ip route 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-thr
 # route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
 ip route ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # route for transit - needed since transit is in a VRF
 ip route ${var.subnet1-vpc-transit-first-three-octets}.0 255.255.255.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
 !
@@ -134,9 +144,11 @@ ip route ${var.subnet1-vpc-transit-first-three-octets}.0 255.255.255.0 GigabitEt
 # route for hub 1 - needed since hub 1 is in a VRF
 ip route ${var.subnet1-vpc-hub1-first-three-octets}.0 255.255.255.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for hub 2 - needed since hub 2 is in a VRF
 ip route ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 !
 ### VRF management routes
 # in this script, path to management interfaces is through the transit VPC peering to management VPC, thus no path to management is configured in these Network Virtual Appliances, so routing not added here
@@ -151,17 +163,21 @@ ip route vrf ${var.vrf-transit-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.s
 # route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # no route added for management since it will only be reachable through management VPC
 !
 # route for hub 1 - needed since hub 1 is in a VRF
 ip route vrf ${var.vrf-transit-name} ${var.subnet1-vpc-hub1-first-three-octets}.0 255.255.255.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for hub 2 - needed since hub 2 is in a VRF
 ip route vrf ${var.vrf-transit-name} ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # local VRF route for load balancer health check range 1 return path traffic
 ip route vrf ${var.vrf-transit-name} ${cidrhost(var.health-check-source-ip-range-1, 0)} ${cidrnetmask(var.health-check-source-ip-range-1)} GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
 !
@@ -179,17 +195,21 @@ ip route vrf ${var.vrf-hub1-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subn
 # route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # route for transit - needed since transit is in a VRF
 ip route vrf ${var.vrf-hub1-name} ${var.subnet1-vpc-transit-first-three-octets}.0 255.255.255.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
 !
 # no route added for management since it will only be reachable through management VPC
 !
+%{ if local.deploy_hub2 ~}
 # route for hub 2 - needed since hub 2 is in a VRF
 ip route vrf ${var.vrf-hub1-name} ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # local VRF route for load balancer health check range 1 return path traffic
 ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-1, 0)} ${cidrnetmask(var.health-check-source-ip-range-1)} GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
@@ -197,6 +217,7 @@ ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-1,
 ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-2, 0)} ${cidrnetmask(var.health-check-source-ip-range-2)} GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 !
+%{ if local.deploy_hub2 ~}
 ### VRF hub 2 routes
 # default route to global table
 ip route vrf ${var.vrf-hub2-name} 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1 global
@@ -225,8 +246,11 @@ ip route vrf ${var.vrf-hub2-name} ${cidrhost(var.health-check-source-ip-range-1,
 ip route vrf ${var.vrf-hub2-name} ${cidrhost(var.health-check-source-ip-range-2, 0)} ${cidrnetmask(var.health-check-source-ip-range-2)} GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
 !
+%{ endif ~}
 ip nat inside source list NAT_ACL interface GigabitEthernet1 vrf ${var.vrf-hub1-name} overload
+%{ if local.deploy_hub2 ~}
 ip nat inside source list NAT_ACL interface GigabitEthernet1 vrf ${var.vrf-hub2-name} overload
+%{ endif ~}
 ip access-list standard NAT_ACL
 10 permit 10.0.0.0 0.255.255.255
 20 permit 10.2.0.0 0.0.255.255
@@ -239,6 +263,7 @@ EOS
 
 
 resource "google_compute_instance" "nva2" {
+  count          = local.deploy_nva ? 1 : 0
 #  name           = "nva2-${local.temp-name-variation}"
   name           = "nva2"
   machine_type   = "n1-standard-8"
@@ -251,14 +276,14 @@ resource "google_compute_instance" "nva2" {
     }
   }
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-untrusted.self_link
+    subnetwork = google_compute_subnetwork.subnet1-vpc-untrusted[0].self_link
     network_ip = "${var.subnet1-vpc-untrusted-first-three-octets}${var.nva2-int-address}"
     access_config {
       # ephemeral public IP
     }
   }
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-management.self_link
+    subnetwork = google_compute_subnetwork.subnet1-vpc-management[0].self_link
     network_ip = "${var.subnet1-vpc-management-first-three-octets}${var.nva2-int-address}"
   }
   network_interface {
@@ -266,12 +291,15 @@ resource "google_compute_instance" "nva2" {
     network_ip = "${var.subnet1-vpc-transit-first-three-octets}${var.nva2-int-address}"
   }
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-hub1.self_link
+    subnetwork = google_compute_subnetwork.subnet1-vpc-hub1[0].self_link
     network_ip = "${var.subnet1-vpc-hub1-first-three-octets}${var.nva2-int-address}"
   }
-  network_interface {
-    subnetwork = google_compute_subnetwork.subnet1-vpc-hub2.self_link
-    network_ip = "${var.subnet1-vpc-hub2-first-three-octets}${var.nva2-int-address}"
+  dynamic "network_interface" {
+    for_each = local.deploy_hub2 ? [1] : []
+    content {
+      subnetwork = google_compute_subnetwork.subnet1-vpc-hub2[0].self_link
+      network_ip = "${var.subnet1-vpc-hub2-first-three-octets}${var.nva2-int-address}"
+    }
   }
   metadata = {
     # Note: the "1.1.1" in the cidrnetmask function is a placeholder, ie doesn't matter, only the mask matters) 
@@ -294,11 +322,13 @@ rd ${var.vrf-hub1-route-descriptor}
 address-family ipv4
 exit-address-family
 !
+%{ if local.deploy_hub2 ~}
 vrf definition ${var.vrf-hub2-name}
 rd ${var.vrf-hub2-route-descriptor}
 address-family ipv4
 exit-address-family
 !
+%{ endif ~}
 interface GigabitEthernet1
 description VPC untrusted - no secondary address for LB configured - not needed on GigabitEthernet1 / VM nic0
 ip address ${var.subnet1-vpc-untrusted-first-three-octets}${var.nva2-int-address} ${cidrnetmask("1.1.1${var.last-octet-and-mask}")}
@@ -325,6 +355,7 @@ ip address ${var.subnet1-vpc-hub1-first-three-octets}${var.ilb-forwarding-rule-a
 ip nat inside
 no shut
 !
+%{ if local.deploy_hub2 ~}
 interface GigabitEthernet5
 description hub 2
 vrf forwarding ${var.vrf-hub2-name}
@@ -333,6 +364,7 @@ ip address ${var.subnet1-vpc-hub2-first-three-octets}${var.ilb-forwarding-rule-a
 ip nat inside
 no shut
 !
+%{ endif ~}
 ### Global Table Routes
 ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1
 !
@@ -342,9 +374,11 @@ ip route 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-thr
 # route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
 ip route ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # route for transit - needed since transit is in a VRF
 ip route ${var.subnet1-vpc-transit-first-three-octets}.0 255.255.255.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
 !
@@ -353,9 +387,11 @@ ip route ${var.subnet1-vpc-transit-first-three-octets}.0 255.255.255.0 GigabitEt
 # route for hub 1 - needed since hub 1 is in a VRF
 ip route ${var.subnet1-vpc-hub1-first-three-octets}.0 255.255.255.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for hub 2 - needed since hub 2 is in a VRF
 ip route ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 !
 ### VRF management routes
 # in this script, path to management interfaces is through the transit VPC peering to management VPC, thus no path to management is configured in these Network Virtual Appliances, so routing not added here
@@ -370,17 +406,21 @@ ip route vrf ${var.vrf-transit-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.s
 # route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-transit-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # no route added for management since it will only be reachable through management VPC
 !
 # route for hub 1 - needed since hub 1 is in a VRF
 ip route vrf ${var.vrf-transit-name} ${var.subnet1-vpc-hub1-first-three-octets}.0 255.255.255.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for hub 2 - needed since hub 2 is in a VRF
 ip route vrf ${var.vrf-transit-name} ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # local VRF route for load balancer health check range 1 return path traffic
 ip route vrf ${var.vrf-transit-name} ${cidrhost(var.health-check-source-ip-range-1, 0)} ${cidrnetmask(var.health-check-source-ip-range-1)} GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
 !
@@ -398,17 +438,21 @@ ip route vrf ${var.vrf-hub1-name} 10.0.0.0 255.0.0.0 GigabitEthernet3 ${var.subn
 # route for all spokes in hub 1 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub1-second-octet}.0.0 255.255.0.0 GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
+%{ if local.deploy_hub2 ~}
 # route for all spokes in hub 2 - second octet in address represents the hub where the spokes connect
 ip route vrf ${var.vrf-hub1-name} ${var.spoke-first-octet}${var.spoke-hub2-second-octet}.0.0 255.255.0.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # route for transit - needed since transit is in a VRF
 ip route vrf ${var.vrf-hub1-name} ${var.subnet1-vpc-transit-first-three-octets}.0 255.255.255.0 GigabitEthernet3 ${var.subnet1-vpc-transit-first-three-octets}.1
 !
 # no route added for management since it will only be reachable through management VPC
 !
+%{ if local.deploy_hub2 ~}
 # route for hub 2 - needed since hub 2 is in a VRF
 ip route vrf ${var.vrf-hub1-name} ${var.subnet1-vpc-hub2-first-three-octets}.0 255.255.255.0 GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
+%{ endif ~}
 # local VRF route for load balancer health check range 1 return path traffic
 ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-1, 0)} ${cidrnetmask(var.health-check-source-ip-range-1)} GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
@@ -416,6 +460,7 @@ ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-1,
 ip route vrf ${var.vrf-hub1-name} ${cidrhost(var.health-check-source-ip-range-2, 0)} ${cidrnetmask(var.health-check-source-ip-range-2)} GigabitEthernet4 ${var.subnet1-vpc-hub1-first-three-octets}.1
 !
 !
+%{ if local.deploy_hub2 ~}
 ### VRF hub 2 routes
 # default route to global table
 ip route vrf ${var.vrf-hub2-name} 0.0.0.0 0.0.0.0 GigabitEthernet1 ${var.subnet1-vpc-untrusted-first-three-octets}.1 global
@@ -444,8 +489,11 @@ ip route vrf ${var.vrf-hub2-name} ${cidrhost(var.health-check-source-ip-range-1,
 ip route vrf ${var.vrf-hub2-name} ${cidrhost(var.health-check-source-ip-range-2, 0)} ${cidrnetmask(var.health-check-source-ip-range-2)} GigabitEthernet5 ${var.subnet1-vpc-hub2-first-three-octets}.1
 !
 !
+%{ endif ~}
 ip nat inside source list NAT_ACL interface GigabitEthernet1 vrf ${var.vrf-hub1-name} overload
+%{ if local.deploy_hub2 ~}
 ip nat inside source list NAT_ACL interface GigabitEthernet1 vrf ${var.vrf-hub2-name} overload
+%{ endif ~}
 ip access-list standard NAT_ACL
 10 permit 10.0.0.0 0.255.255.255
 20 permit 10.2.0.0 0.0.255.255
