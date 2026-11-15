@@ -15,7 +15,7 @@
  */
 
 module "vpn-1" {
-  source     = "github.com/kurtradecki/gcp-vpn-vpc-demo"
+  source     = "github.com/kurtradecki/gcp-vpn-vpc-demo?ref=v2.0.0"
   project-id = var.project_id
   region1    = var.region1
 #  vpc1name   = google_compute_network.vpc["vpc-routing"].name
@@ -38,7 +38,7 @@ module "vpn-1" {
 
 
 module "vpn-2" {
-  source     = "github.com/kurtradecki/gcp-vpn-vpc-demo"
+  source     = "github.com/kurtradecki/gcp-vpn-vpc-demo?ref=v2.0.0"
   project-id = var.project_id
   region1    = var.region2
 #  vpc1name   = google_compute_network.vpc["vpc-routing2"].name
