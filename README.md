@@ -30,7 +30,7 @@ Process to run the script:
 * At the command prompt run gcloud config set project <project_id> . Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 * In Google Cloud Shell Clone this repo: `git clone https://github.com/kurtradecki/gcp-ncc-full-demo.git` Reference if needed [Clone a repository](https://cloud.google.com/shell/docs/version-control#clone_a_repository)
 * Note: Needed APIs are enabled and Org policies are set in the script, so you'll need permissions to set those
-* Copy exmaple.tfvars (can use [cp command](https://www.geeksforgeeks.org/linux-unix/cp-command-linux-examples/)) to terraform.tfvars and add values in terraform.tfvars such as project-id. Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+* Copy exmaple.tfvars (can use [cp command](https://www.geeksforgeeks.org/linux-unix/cp-command-linux-examples/)) to terraform.tfvars and add values in terraform.tfvars such as project_id. Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 * At the command prompt run the following terraform commands:
   * `terraform init`
   * `terraform plan`
