@@ -41,7 +41,7 @@ The Network Virtual Appliances (NVAs) used in the script are Cisco Cloud Service
 
 ## Test reachability throuhgout the environment
 
-Wait ~9 minutes and your environment will be ready to explore. Below is a bash script to test reachability from any host. Before running the script, set the relevant IP addresses based on the environment you built: 
+After ~10 minutes your environment will be ready to explore. Below is a bash script to test reachability from any host. Before running the script, set the relevant IP addresses based on the environment you built: 
 
 Architecture Option 1 IPs: 
 ```
@@ -106,4 +106,4 @@ To delete the created infrastructure, run the following command:
 terraform destroy -auto-approve
 ```
 
-Wait a few minutes for the components created by the Terraform script to be removed. You'll see a message similar to "Destroy complete!" 
+It takes ~10 minutes for the components created by the Terraform script to be removed. You'll see a message similar to "Destroy complete!" 
