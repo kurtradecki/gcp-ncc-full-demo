@@ -5,7 +5,7 @@ With a few settings you can create the following hub and spoke environment with 
 
 Note: This architecture is purposely overbuilt. It builds a variety of architectural options built in the same architecture. Your production architecture would likely be much more simplified than the diagram above.
 
-The NVAs used in the script are Cisco Cloud Services Routers (CSRs). Future versions of the script may add modularity and standard Terraform practices if they are needed, though the intent of the script is to create a fixed environment for learning and demonstration, **not production**.
+The Network Virtual Appliances (NVAs) used in the script are Cisco Cloud Services Routers (CSRs). Future versions of the script may add modularity and standard Terraform practices if they are needed, though the intent of the script is to create a fixed environment for learning and demonstration, **not production**.
 
 Capabilities that can be demonstrated:
 * Integration between NCC, VPC Peering and NVAs
