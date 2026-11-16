@@ -1,4 +1,4 @@
-# Automate hub and spoke with NCC and network virtual appliances for Google Cloud demos, pilots, and learning
+# Automate hub and spoke with NCC and NVAs for Google Cloud demos, pilots, and learning
 
 With a few settings you can create the following hub and spoke environment with full Google Cloud network setup and a fully configured pair of Network Virtual Appliances (NVAs) for understanding separate Google Cloud network patterns all in 1 architecture build. 
 ![Hub and spoke architecture](./archdiagv1.png)
