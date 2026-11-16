@@ -12,24 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# typical time to build: 10 mins
-# typical time to destroy: 10 mins
+# typical time to build: ~10 mins
+# typical time to destroy: ~10 mins
 
 # === Future enhancements ===
-# changes all names
-# Github upload
-# troubleshoot https://github.com/kurtradecki/gcp-orgpolicies-demo
-# Github upload
 # refactor fw rules under policies
-# Github upload
-# refactor to simplify constructs such as multiple subnets, vms, etc
-# Github upload
-# refactor vpn tunnel names in ncc hybrid spokes ... right now they are hardcoded
-# Github upload
-# 11) add extra time to wait for apis and org policies to load
-# Github upload
-# 12) test in new project & revise build timing
-# Github upload
 
 
 project_id                 = "<ENTER PROJECT ID HERE>"
