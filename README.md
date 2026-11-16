@@ -91,7 +91,7 @@ Bash script (all Architectures):
 ## Note about the script and environment
 
 * Network Virtual Appliance (NVA) can be accessed via console. Select an NVA VM in the GCP console and press the "CONNECT TO SERIAL CONSOLE" button.
-* Network Virtual Appliance (NVA) credentials, username: consoleadmin, password: google123 
+* Network Virtual Appliance (NVA) credentials, username: consoleadmin, password: google123 (recommendation: change this on the first login)
 * No Cloud NAT for untrusted VPCs and routing not allowed through appliances from untrusted to any of the other VPCs, so traffic sourced from vm-untrusted will fail to reach other hosts. This VM is to test reachability from other VPCs to it. 
 * By design vm-management is isolated and only able to reach the NVAs. 
 
