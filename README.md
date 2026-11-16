@@ -1,7 +1,10 @@
 # Automate hub and spoke with NCC and NVAs for Google Cloud demos, pilots, and learning
 
-With a few settings you can create the following hub and spoke environment with full Google Cloud network setup and a fully configured pair of Network Virtual Appliances (NVAs) for understanding separate Google Cloud network patterns all in 1 architecture build. 
-![Hub and spoke architecture](./archdiagv1.png)
+With a few settings you can create a variety of hub and spoke patterns including Network Connectivity Center (NCC) and a fully configured pair of Network Virtual Appliances (NVAs). Here are the options: 
+![Hub and spoke Option 1](./archdiag1.png)
+![Hub and spoke Option 2](./archdiag2.png)
+![Hub and spoke Option 3](./archdiag3.png)
+![Hub and spoke Option 4](./archdiag4.png)
 
 Note: This architecture is purposely overbuilt. It builds a variety of architectural options built in the same architecture. Your production architecture would likely be much more simplified than the diagram above.
 
