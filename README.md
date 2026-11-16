@@ -43,28 +43,28 @@ The Network Virtual Appliances (NVAs) used in the script are Cisco Cloud Service
 
 Wait ~9 minutes and your environment will be ready to explore. Below is a bash script to test reachability from any host. Before running the script, set the relevant IP addresses based on the environment you built: 
 
-Option 1 IPs: 
+Architecture Option 1 IPs: 
 ```
 IP_LIST="192.168.10.10 10.110.110.2 10.120.120.2 10.210.210.2 10.220.220.2 10.11.11.2 10.12.12.2 10.21.21.2 10.22.22.2 10.31.31.2 10.32.32.2 10.41.41.2 10.42.42.2 8.8.8.8"
 ```
 
-Option 2 IPs: 
+Architecture Option 2 IPs: 
 ```
 IP_LIST="172.16.1.10 10.1.1.10 10.1.2.10 192.168.10.10 10.110.110.2 10.120.120.2 10.210.210.2 10.220.220.2 8.8.8.8"
 ```
 
-Option 3 IPs: 
+Architecture Option 3 IPs: 
 ```
 IP_LIST="172.16.1.10 10.1.1.10 10.1.2.10 172.16.2.10 10.2.1.10 10.2.2.10 192.168.10.10 10.110.110.2 10.120.120.2 10.210.210.2 10.220.220.2 8.8.8.8"
 ```
 
-Option 4 IPs: 
+Architecture Option 4 IPs: 
 ```
 IP_LIST="172.16.1.10 10.1.1.10 10.1.2.10 172.16.2.10 10.2.1.10 10.2.2.10 192.168.10.10 10.110.110.2 10.120.120.2 10.210.210.2 10.220.220.2 10.11.11.2 10.12.12.2 10.21.21.2 10.22.22.2 10.31.31.2 10.32.32.2 10.41.41.2 10.42.42.2 8.8.8.8"
 ```
 
 
-Bash script:
+Bash script (all Architectures):
 ```
     for ip in $IP_LIST; do
         ping -c 1 -W 0.5 "$ip"
