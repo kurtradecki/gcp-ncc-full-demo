@@ -1,9 +1,13 @@
 # Automate hub and spoke with NCC and NVAs for Google Cloud demos, pilots, and learning
 
 With a few settings you can create a variety of hub and spoke patterns including Network Connectivity Center (NCC) and a fully configured pair of Network Virtual Appliances (NVAs). Here are the options: 
+
 ![Hub and spoke Option 1](./archdiag1.png)
+
 ![Hub and spoke Option 2](./archdiag2.png)
+
 ![Hub and spoke Option 3](./archdiag3.png)
+
 ![Hub and spoke Option 4](./archdiag4.png)
 
 Note: Options 3 and 4 are purposely overbuilt. They build a variety of architectural options in the same architecture, perhaps to model migrations. Your production architecture would likely align closer to Options 1 or 2.
