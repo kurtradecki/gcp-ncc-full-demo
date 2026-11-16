@@ -6,7 +6,7 @@ With a few settings you can create a variety of hub and spoke patterns including
 ![Hub and spoke Option 3](./archdiag3.png)
 ![Hub and spoke Option 4](./archdiag4.png)
 
-Note: This architecture is purposely overbuilt. It builds a variety of architectural options built in the same architecture. Your production architecture would likely be much more simplified than the diagram above.
+Note: Options 3 and 4 are purposely overbuilt. They build a variety of architectural options in the same architecture, perhaps to model migrations. Your production architecture would likely align closer to Options 1 or 2.
 
 The Network Virtual Appliances (NVAs) used in the script are Cisco Cloud Services Routers (CSRs). Future versions of the script may add modularity and standard Terraform practices if they are needed, though the intent of the script is to create a fixed environment for learning and demonstration, **not production**.
 
