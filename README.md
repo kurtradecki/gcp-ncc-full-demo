@@ -41,7 +41,7 @@ The Network Virtual Appliances (NVAs) used in the script are Cisco Cloud Service
 
 ## Test reachability throuhgout the environment
 
-After ~10 minutes your environment will be ready to explore. Note: it can take a few minutes for the Cisco router to initialize so that it can route. Below is a bash script to test reachability from any host. Before running the script, set the relevant IP addresses based on the environment you built: 
+After ~10 minutes your environment will be ready to explore. Note: it can take a few minutes for the Cisco router to initialize so that it can route. Below is a bash script to test reachability from any host in the GCP environment that the script creates. Before running the script, set the relevant IP addresses based on the environment you built: 
 
 Architecture Option 1 IPs: 
 ```
